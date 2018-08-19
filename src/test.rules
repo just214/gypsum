@@ -1,0 +1,10 @@
+function isMessage(data) {
+  data.size === 4
+  && data.userName is string
+  && data.createdAt is timestamp
+}
+isMessage()
+match /messages/{messageId} {
+  allow create: if request.resource.data.size == 4;
+      && request.resource.data
+}

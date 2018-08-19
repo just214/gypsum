@@ -1,0 +1,103 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // HELPERS //
+
+    function isNull(value) {
+      return value == null;
+    }
+
+    function isTimestamp(value) {
+      return isNull(value) || value is timestamp;
+    }
+
+    function isString(value) {
+      return isNull(value) || value is string;
+    }
+
+    function isNumber(value) {
+      return isNull(value) || value is number;
+    }
+
+    function isInt(value) {
+      return value is int;
+    }
+
+    function isPresent(resource, field) {
+      return !isNull(resource.data[field]) &&
+             ( !isString(resource.data[field]) || resource.data[field].trim() != '' );
+    }
+
+    function isRequired(resource, field, required) {
+      return !required || isPresent(resource, field);
+    }
+
+    function atLeast(value, min) {
+      return isNull(min) || value.trim().size() >= min;
+    }
+
+    function atMost(value, max) {
+      return isNull(max) || value.trim().size() <= max;
+    }
+
+    // VALIDATIONS //
+
+    function validateIncludeItems(resource, field, items) {
+      return isNull(items) ||
+             isNull(resource.data[field]) ||
+             resource.data[field].trim() in items;
+    }
+
+    function validateLength(resource, field, min, max) {
+      return isNull(min) && isNull(max) || (
+             atLeast(resource.data[field], min) &&
+             atMost(resource.data[field], max)
+      );
+    }
+
+    function validatePositiveNumber(resource, field, required) {
+   	 return isRequired(resource, field, required) &&
+           	isInt(resource.data[field]) &&
+           	resource.data[field] >= 0;
+    }
+
+    function validateString(resource, field, required, min, max, items) {
+      return isRequired(resource, field, required) &&
+             isString(resource.data[field]) &&
+             validateLength(resource, field, min, max) &&
+             validateIncludeItems(resource, field, items);
+    }
+
+    function validateTimestamp(resource, field, required) {
+      return isRequired(resource, field, required) &&
+             isTimestamp(resource.data[field]);
+    }
+
+    function validateUser(resource, field, required, role) {
+     return isRequired(resource, field, required) &&
+            ( isNull(resource.data[field]) || userExists(resource.data[field]) ) &&
+            ( isNull(role) || ( isNull(resource.data[field]) || userHasRole(resource.data[field], role) ) );
+    }
+
+    // DOCUMENT VALIDATIONS //
+
+    function validateNinja(resource) {
+    	return (
+        validateString(resource, 'name', true, 4, 100, null) &&
+        validatePositiveNumber(resource, 'code', true) &&
+        validateUser(resource, 'created_by', true, 'admin') &&
+        validateUser(resource, 'updated_by', true, 'admin') &&
+        validateTimestamp(resource, 'created_at', true)  &&
+        validateTimestamp(resource, 'updated_at', true)
+      )
+    }
+
+    // MATCHERS //
+
+    match /ninjas/{document=**} {
+      allow read, delete: if isAuthenticated();
+      allow create: if isAuthenticated() && validateNinja(request.resource);
+      allow update: if isAuthenticated() && validateNinja(request.resource);
+    }
+  }
+}

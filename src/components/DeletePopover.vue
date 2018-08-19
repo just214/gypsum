@@ -1,0 +1,38 @@
+<template>
+  <el-popover placement="top"
+    width="250"
+    v-model="visible[refKey]">
+    <slot>
+      <p>Are you sure to delete this collection?</p>
+    </slot>
+
+    <div style="text-align: right; margin: 0">
+      <el-button type="text"
+        size="mini"
+        @click="visible[refKey] = false">Cancel</el-button>
+      <el-button size="mini"
+        type="primary"
+        @click="$emit('delete')">Confirm</el-button>
+
+    </div>
+
+    <i class="fa fa-trash"
+      @click="visible[refKey] = true"
+      slot="reference"
+      type="text"
+      style="color: var(--danger);margin-left: 8px;cursor: pointer;" />
+
+  </el-popover>
+</template>
+
+<script>
+export default {
+  props: ['refKey'],
+  data: () => ({
+    visible: {},
+  }),
+};
+</script>
+
+<style>
+</style>

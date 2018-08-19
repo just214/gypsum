@@ -1,0 +1,104 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // USERS //
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    function getAuthId() {
+      return request.auth.uid;
+    }
+
+    function userExists(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function getUserData(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data
+    }
+
+    function getCurrentUserData() {
+      return getUserData(request.auth.uid)
+    }
+
+    function userBelongsToCompany() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId == incomingData().id;
+    }
+
+    function getUserEmail() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.emailAddress;
+    }
+
+    function getCompanyIdFromUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.companyId;
+    }
+
+    // ROLES //
+
+    function userHasRole(uid, role) {
+      return getUserData(uid).roles[role];
+    }
+
+    function userHasAnyRole(uid, roles) {
+      return getUserData(uid).roles.keys().hasAny(roles);
+    }
+
+    function userHasAllRoles(uid, roles) {
+      return getUserData(uid).roles.keys().hasAll(roles);
+    }
+
+    function getCurrentUserHasRole(role) {
+      return userHasRole(request.auth.uid, role)
+    }
+
+    function getCurrentUserHasAnyRole(roles) {
+      return userHasAnyRole(request.auth.uid, roles)
+    }
+
+    function getCurrentUserHasAllRoles(roles) {
+      return userHasAllRoles(request.auth.uid, roles)
+    }
+
+    function isCurrentUserAdmin() {
+      return getCurrentUserHasRole('admin');
+    }
+
+    // RESOURCE //
+
+    function existingData() {
+      return resource.data
+    }
+
+    function incomingData() {
+      return request.resource.data
+    }
+
+
+    match /claims/{claimId} {
+    	allow create, read, update, delete: if isAuthed();
+    }
+    match /collections/{collectionId} {
+    	allow create, read, update, delete: if isAuthed();
+    }
+     match /subcollections/{subcollectionId} {
+    	allow create, read, update, delete: if isAuthed();
+    }
+    match /collections/{collectionId}/subcollections/{subcollectionId} {
+    	allow create, read, update, delete: if isAuthed();
+    }
+    match /users/{userId} {
+    	allow create, read: if isAuthed();
+      allow update, delete: if getAuthId() == userId;
+    }
+    match /companies/{companyId} {
+      allow read: if isAuthed();
+      allow create, update, delete: if userBelongsToCompany() && isCurrentUserAdmin();
+
+    }
+    match /codes/{codeId} {
+    	allow read, delete: if getUserEmail() == existingData().userEmail || getCompanyIdFromUser() ==  existingData().companyId;
+      allow create, update: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles.admin == true;
+    }
+  }
+}
