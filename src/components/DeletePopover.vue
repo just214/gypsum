@@ -12,7 +12,7 @@
         @click="visible[refKey] = false">Cancel</el-button>
       <el-button size="mini"
         type="primary"
-        @click="$emit('delete')">Confirm</el-button>
+        @click="$emit('delete');visible[refKey] = false">Confirm</el-button>
 
     </div>
 
@@ -26,8 +26,12 @@
 </template>
 
 <script>
+import VueTypes from 'vue-types';
+
 export default {
-  props: ['refKey'],
+  props: {
+    refKey: VueTypes.string.def(Math.random()),
+  },
   data: () => ({
     visible: {},
   }),

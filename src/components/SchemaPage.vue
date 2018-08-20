@@ -2,11 +2,6 @@
   <SchemaLayout :showSideNavAtStartup="!!allCollections.length">
     <template slot="nav-items">
 
-      <DatabaseForm @add="databaseName => $store.dispatch('addDatabase', databaseName)"
-    
-        @selected="handleSelectedDatabase"
-        :databases="databases" />
-
       <zoom-center-transition>
         <div v-if="allCollections.length">
           <RulesDialog :rules="getRules(allCollections, allFieldValues)" />
@@ -14,7 +9,16 @@
             :count="allFieldValues.length" />
         </div>
       </zoom-center-transition>
-      <div style="text-align: center;">
+
+      <div style="text-align: center">
+        <router-link to="/wizard">
+          <el-button round
+            size="mini"
+            style=" width: 100%">
+            <i class="fa fa-magic" />&nbsp;Wizard</el-button>
+        </router-link>
+      </div>
+      <div style="text-align: center;margin-top: 5px;">
         <el-button round
           size="mini"
           style=" width: 100%"
@@ -37,11 +41,12 @@
     <div class="schema-container"
       :style="{backgroundColor: bgColor}">
 
-      <div v-if="selectedDatabaseName">
-        <DatabaseName :database="databases.find(db => db.id === selectedDatabaseId)"
-          @delete="deleteDatabase"
-          @edit="newName => editDatabaseName(newName)" />
-      </div>
+      <DatabaseName :database="databases.find(db => db.id === selectedDatabaseId)"
+        @add="databaseName => $store.dispatch('addDatabase', databaseName)"
+        v-if="databases.length"
+        @delete="deleteDatabase"
+        @edit="newName => editDatabaseName(newName)"
+        @selected="handleSelectedDatabase" />
 
       <zoom-center-transition mode="out-in">
 
@@ -51,8 +56,11 @@
             <b>Welcome to</b>
           </h1>
           <h1 class="title-text">Gypsum</h1>
-
-          <h3 style="color: var(--gray-5)">Start by adding your first database in the side nav.</h3>
+          <h3 style="color: var(--gray-5)">Let's start by adding your first database.</h3>
+          <DatabaseForm @add="databaseName => $store.dispatch('addDatabase', databaseName)"
+        
+            @selected="handleSelectedDatabase"
+            :databases="databases" />
         </div>
 
         <div v-if=" readyForTextAnimation && databases.length && !selectedDatabaseId"
@@ -61,7 +69,7 @@
             <b>Welcome to</b>
           </h1>
           <h1 class="title-text">Gypsum</h1>
-          <h3 style="color: var(--gray-5)">Select a database or add a new one to begin.</h3>
+          <h3 style="color: var(--gray-5)">Select a database to start creating.</h3>
         </div>
 
         <div v-if="!allCollections.length 
@@ -78,8 +86,9 @@
       <transition name="slide"
         mode="out-in">
         <div v-if="showPotoo"
+          key="potoo"
           style="position:absolute;bottom: 0px;left: 50%;
-    transform: translate(-50%, 0);text-align: center;">
+    transform: translate(-50%, 0);text-align: center;display: inline-block;">
 
           <img src="../assets/potoo.png" />
         </div>
@@ -195,6 +204,7 @@ import DeletePopover from './DeletePopover';
 import CollectionName from './CollectionName';
 import DatabaseForm from './DatabaseForm';
 import DatabaseName from './DatabaseName';
+import DataWizard from './DataWizard';
 
 export default {
   components: {
@@ -208,6 +218,7 @@ export default {
     CollectionName,
     DatabaseForm,
     DatabaseName,
+    DataWizard,
   },
   data: () => ({
     pending: false,
@@ -297,8 +308,12 @@ export default {
   text-align: center;
   margin-top: 150px;
   height: 100%;
+  position: fixed;
+  transform: translateX(-50%);
+  left: 50%;
   flex-wrap: wrap;
   color: var(--gray-5);
+  width: 350px;
 }
 
 .title-text {

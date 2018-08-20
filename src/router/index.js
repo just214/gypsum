@@ -6,6 +6,7 @@ import store from '@/store';
 // * Components
 import AuthPage from '@/components/Auth/AuthPage';
 import SchemaPage from '@/components/SchemaPage';
+import DataWizard from '@/components/DataWizard';
 
 Vue.use(Router);
 
@@ -29,9 +30,9 @@ const router = new Router({
       meta: { requiresRegistration: true },
     },
     {
-      path: '/databases/:databaseId',
-      name: 'Database',
-      component: SchemaPage,
+      path: '/wizard',
+      name: 'DataWizard',
+      component: DataWizard,
       meta: { requiresRegistration: true },
     },
   ],

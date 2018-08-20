@@ -16,6 +16,7 @@ module.exports = {
     // prettier-ignore
     'indent': 'off',
     'no-param-reassign': 'off',
+    'max-len': 'off',
   },
   parserOptions: {
     parser: 'babel-eslint',
