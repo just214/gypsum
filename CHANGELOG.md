@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 **TYPES OF CHANGES: Added, Changed, Deprecated, Removed, Fixed, Security**
 
-## [Unreleased]- 08-20-2018 - 07/31/2018
+## [Unreleased]- 08-21-2018
+
+### Changed
+
+- Fixed several small and medium sized bugs.
+- Removed copy functionality for collections and subcollections (for now)
+- Moved fields to a seperate root-level collection.
+
+## [Unreleased]- 08-20-2018
 
 ### Added
 

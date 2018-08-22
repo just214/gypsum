@@ -1,18 +1,22 @@
 import { db, setMerge } from '@/firebase';
 import shortid from 'shortid';
 import { Message, Notification } from 'element-ui';
+import cloneDeep from 'lodash/cloneDeep';
 
 const fieldAlreadyExists = (newField, collection) => {
   if (!collection.fields) return false;
-  const existingFieldWithSameName = collection.fields.filter(
-    field =>
-      field.fieldName === newField.fieldName && field.key !== newField.key,
+
+  const existingFieldWithSameName = collection.fields.find(
+    field => field.name === newField.name,
   );
 
-  if (existingFieldWithSameName.length) {
+  if (
+    existingFieldWithSameName &&
+    existingFieldWithSameName.id !== newField.id
+  ) {
     Message({
       message: `Oops..this collection already has a field named ${
-        newField.fieldName
+        newField.name
       }.`,
       type: 'error',
       duration: 1250,
@@ -25,43 +29,69 @@ const fieldAlreadyExists = (newField, collection) => {
 
 export default {
   addField(context, { field, collection, callback }) {
+    // TODO -  The callback is for UI only. Switch to promise if possible since $emitters.
+
+    /*
+    * This addField method is responsible for:
+    * - Adding the new field to the field collection with the collection's data...
+    * - Updating the collection's 'fieldOrder' array with the id of the new field. 
+    */
     if (fieldAlreadyExists(field, collection)) {
       return;
     }
+
+    // * Generate a unique id for this new field.
+
+    const id = `${field.name}_${shortid.generate()}`;
+
     const updatedField = {
       ...field,
-      //* create a new key last in case it was a copy and contains a key already.
-      key: shortid.generate(),
-      parentKey: collection.key,
-      parentFullPath: collection.fullpath,
+
+      id,
+      collectionId: collection.id,
+      collectionFullpath: collection.fullpath,
+      databaseId: context.state.selectedDatabaseId,
+      ownerId: context.rootState.auth.userData.id,
     };
 
-    let newFields = [];
+    const batch = db.batch();
 
-    if (collection.fields) {
-      newFields = [...collection.fields, updatedField];
-    } else {
-      newFields = [updatedField];
-    }
-    const dbRef = db.collection('collections').doc(collection.key);
-    setMerge(dbRef, { fields: newFields }).then(() => {
+    const fieldRef = db.collection('fields').doc(id);
+
+    batch.set(fieldRef, updatedField);
+
+    const colRef = db.collection('collections').doc(collection.id);
+    const oldFieldOrder =
+      collection.fieldOrder && collection.fieldOrder.length
+        ? collection.fieldOrder
+        : [];
+
+    const newFieldOrder = [...oldFieldOrder, updatedField.id];
+
+    batch.set(colRef, { fieldOrder: newFieldOrder }, { merge: true });
+
+    batch.commit().then(() => {
       callback();
     });
   },
+
   editField(context, { field, collection, callback }) {
     if (fieldAlreadyExists(field, collection)) {
       return;
     }
     const newFields = collection.fields.map(f => {
-      if (f.key === field.key) {
+      if (f.id === field.id) {
         return field;
       }
       return f;
     });
-    const dbRef = db.collection('collections').doc(collection.key);
+    const dbRef = db.collection('collections').doc(collection.id);
     setMerge(dbRef, { fields: newFields }).then(() => {
       callback();
     });
+
+    const fieldRef = db.collection('fields').doc(field.id);
+    setMerge(fieldRef, field);
   },
   async deleteField(context, { field, collection }) {
     // * This method is responsible for:
@@ -73,32 +103,37 @@ export default {
 
     const batch = db.batch();
 
+    if (collection.fieldOrder && collection.fieldOrder.length) {
+      const thisFields = cloneDeep(collection.fieldOrder);
+      const index = thisFields.indexOf(field.id);
+      if (index > -1) {
+        thisFields.splice(index, 1);
+      }
+      const collectionRef = db.collection('collections').doc(collection.id);
+      batch.set(collectionRef, { fieldOrder: thisFields }, { merge: true });
+    }
+
     // * Find all fields that reference this field as a foreignKey
-    const foreignKeyReferences = context.getters.allFieldValues.filter(
-      f => f.foreignKey === field.key,
+    const foreignKeyReferences = context.state.fields.filter(
+      f => f.foreignKey === field.id,
     );
 
     // * Find all fields that reference this field as a foreignCopy
-    const foreignCopyReferences = context.getters.allFieldValues.filter(
-      f => f.foreignCopy === field.key,
+    const foreignCopyReferences = context.state.fields.filter(
+      f => f.foreignCopy === field.id,
     );
 
     const handleBatchReferenceDelete = (arr, type) => {
       arr.forEach(refField => {
-        const newField = { ...refField, [`${type}`]: null, foreignRef: null };
-
-        const fieldsCollection = context.getters.allCollections.find(
-          col => col.key === newField.parentKey,
+        const ref = db.collection('fields').doc(refField.id);
+        batch.set(
+          ref,
+          {
+            [`${type}`]: null,
+            foreignRef: null,
+          },
+          { merge: true },
         );
-        const collectionsFields = fieldsCollection.fields;
-        const newFields = collectionsFields.map(thisField => {
-          if (thisField.key === newField.key) {
-            return newField;
-          }
-          return thisField;
-        });
-        const ref = db.collection('collections').doc(refField.parentKey);
-        batch.set(ref, { fields: { ...newFields } }, { merge: true });
       });
     };
 
@@ -110,42 +145,54 @@ export default {
       handleBatchReferenceDelete(foreignCopyReferences, 'foreignCopy');
     }
 
-    const dbRef = db.collection('collections').doc(collection.key);
-    const newFields = collection.fields.filter(f => f.key !== field.key);
+    const fieldRef = db.collection('fields').doc(field.id);
 
-    batch.set(dbRef, { fields: newFields }, { merge: true });
+    batch.delete(fieldRef);
 
-    batch.commit().then(() => {
-      const handleForeignKey = () => {
-        let foreignKeyRefNames = 'foreignKey references removed:\n\n';
+    batch
+      .commit()
+      .then(() => {
+        const handleForeignKey = () => {
+          let foreignKeyRefNames =
+            'These foreignKey references were removed:\n\n';
 
-        if (foreignKeyReferences.length) {
-          foreignKeyReferences.forEach(ref => {
-            foreignKeyRefNames = foreignKeyRefNames.concat(
-              `${ref.parentFullPath}/${ref.fieldName}`,
-            );
+          if (foreignKeyReferences.length) {
+            foreignKeyReferences.forEach(ref => {
+              console.log('REF', ref);
+              foreignKeyRefNames = foreignKeyRefNames.concat(
+                `${ref.collectionFullpath}/${ref.name}  `,
+              );
+            });
+          }
+          return foreignKeyReferences.length ? foreignKeyRefNames : '';
+        };
+        const handleForeignCopy = () => {
+          let foreignCopyRefNames =
+            'These foreignCopy references were removed:\n\n';
+
+          if (foreignCopyReferences.length) {
+            foreignCopyReferences.forEach(ref => {
+              console.log('REF', ref);
+              foreignCopyRefNames = foreignCopyRefNames.concat(
+                `${ref.collectionFullpath}/${ref.name}  `,
+              );
+            });
+          }
+          return foreignCopyReferences.length ? foreignCopyRefNames : '';
+        };
+        if (handleForeignKey() || handleForeignCopy()) {
+          Notification({
+            message: handleForeignKey() + handleForeignCopy(),
           });
         }
-        return foreignKeyReferences.length ? foreignKeyRefNames : '';
-      };
-      const handleForeignCopy = () => {
-        let foreignCopyRefNames = 'foreignCopy references removed:\n\n';
-
-        if (foreignCopyReferences.length) {
-          foreignCopyReferences.forEach(ref => {
-            foreignCopyRefNames = foreignCopyRefNames.concat(
-              `${ref.parentFullPath}/${ref.fieldName}`,
-            );
-          });
-        }
-        return foreignCopyReferences.length ? foreignCopyRefNames : '';
-      };
-
-      Notification({
-        title: 'Title',
-        message: handleForeignKey() + handleForeignCopy(),
+      })
+      .catch(error => {
+        Message({
+          message: error.message,
+          type: 'error',
+          duration: 3000,
+          center: true,
+        });
       });
-    });
-    // TODO need to handle the error.
   },
 };

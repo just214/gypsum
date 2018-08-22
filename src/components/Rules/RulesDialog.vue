@@ -5,7 +5,7 @@
         size="mini"
         style="width: 100%;"
         @click="dialogVisible = true">
-        <i class="fa fa-pencil-ruler" />&nbsp;View Rules
+        <i class="fa fa-pencil-ruler" />&nbsp;Rules
       </el-button>
     </div>
 

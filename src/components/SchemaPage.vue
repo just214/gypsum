@@ -27,7 +27,6 @@
       </div>
       <br />
       <el-tree accordion
-        class="truncate"
         :props="{
           children: 'children',
           label: 'name'
@@ -69,7 +68,7 @@
             <b>Welcome to</b>
           </h1>
           <h1 class="title-text">Gypsum</h1>
-          <h3 style="color: var(--gray-5)">Select a database to start creating.</h3>
+          <h3 style="color: var(--gray-5)">Select or create a database in the select box above to start designing.</h3>
         </div>
 
         <div v-if="!allCollections.length 
@@ -77,6 +76,10 @@
           && databases.length 
           && selectedDatabaseId"
           class="title-wrapper">
+          <h3 style="color: var(--gray-5)">You are now in the
+            <span style="color: var(--warning)">
+              <b>{{$store.getters.selectedDatabaseName}}</b>
+            </span> database.</h3>
           <h3 style="color: var(--gray-5)">Click the
             <i class="fa fa-plus"
               style="font-size: 25px;" /> icon to add your first collection!</h3>
@@ -102,7 +105,6 @@
           @change="handleBGColor"></el-color-picker>
         <CollectionForm :collections="collections"
           v-if="selectedDatabaseId"
-          :allCollections="allCollections"
           @submit="values => addCollection(values)" />
 
         <div v-loading.fullscreen.lock="pending">
@@ -113,7 +115,7 @@
               style="display: flex;padding: 10px;">
               <div style="padding: 10px;"
                 v-for="collection in sortedCollectionsByTreeSelection"
-                :key="collection.key">
+                :key="collection.id">
 
                 <CollectionName :collection="collection"
                   @delete="deleteCollection(collection)"
@@ -132,7 +134,7 @@
                 
                     @moveFields="fields => handleMoveField({fields, collection})"
                     @addSubcollection="addSubcollection"
-                    @deleteField="field => deleteField({field, collection})">
+                    @deleteField="field => deleteField({field, collection })">
                     <template slot="rules">
                       <RulesForm />
                     </template>
@@ -141,8 +143,8 @@
                   <zoom-center-transition group>
                     <div v-if="subcollections"
                       v-for="subcollection in subcollections.filter(subcol =>
-                  subcol.parentKey === collection.key)"
-                      :key="subcollection.key">
+                  subcol.parentId === collection.id)"
+                      :key="subcollection.id">
 
                       <el-card shadow="hover"
                         class="subcollection-card">
@@ -172,7 +174,7 @@
                           @editField="(field, callback) => 
                             editField({field, collection:subcollection, callback})"
                       
-                          @moveFields="fields => handleMoveField({fields, subcollection})"
+                          @moveFields="fields => handleMoveField({fields, collection: subcollection})"
                         />
 
                       </el-card>
@@ -197,14 +199,13 @@ import { getRules } from '@/utils';
 import SchemaLayout from './SchemaLayout';
 import CollectionForm from './CollectionForm';
 import CollectionCard from './CollectionCard';
-import RulesDialog from './RulesDialog';
-import RulesForm from './RulesForm';
-import Cluster from './Cluster';
+import RulesDialog from './Rules/RulesDialog';
+import RulesForm from './Rules/RulesForm';
+import Cluster from './Cluster/Cluster';
 import DeletePopover from './DeletePopover';
 import CollectionName from './CollectionName';
 import DatabaseForm from './DatabaseForm';
 import DatabaseName from './DatabaseName';
-import DataWizard from './DataWizard';
 
 export default {
   components: {
@@ -218,7 +219,6 @@ export default {
     CollectionName,
     DatabaseForm,
     DatabaseName,
-    DataWizard,
   },
   data: () => ({
     pending: false,

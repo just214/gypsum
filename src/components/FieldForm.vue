@@ -10,7 +10,7 @@
       size="small"
       ref="nameInput"
       @keyup.enter.native="handleSave"
-      v-model="fieldValues.fieldName" />
+      v-model="fieldValues.name" />
 
     <el-select v-model="fieldValues.dataType"
       filterable
@@ -31,9 +31,9 @@
       v-if="allFieldValues.length"
       placeholder="Foreign Key">
       <el-option v-for='value in allFieldValues'
-        :key='value.key + value.collection'
-        :label="value.collection + '/' + value.fieldName"
-        :value="value.key">
+        :key='value.id + value.collection'
+        :label="value.collection + '/' + value.name"
+        :value="value.id">
       </el-option>
     </el-select>
 
@@ -44,9 +44,9 @@
       v-if="allFieldValues.length"
       placeholder="Foreign Copy">
       <el-option v-for='value in allFieldValues'
-        :key='value.key + value.collection'
-        :label="value.collection + '/' + value.fieldName"
-        :value="value.key">
+        :key='value.id + value.collection'
+        :label="value.collection + '/' + value.name"
+        :value="value.id">
       </el-option>
     </el-select>
 
@@ -229,7 +229,7 @@ import CopySelect from './CopySelect';
 
 const INITIAL_FIELD_VALUES = {
   dataType: '',
-  fieldName: '',
+  name: '',
   required: false,
   min: null,
   max: null,
@@ -341,6 +341,22 @@ export default {
   watch: {
     'fieldValues.primaryKey'(value) {
       if (value) {
+        const currentFieldWithPrimaryKey = this.collection.fields.find(
+          field => field.primaryKey,
+        );
+        if (
+          currentFieldWithPrimaryKey &&
+          currentFieldWithPrimaryKey.id !== this.fieldValues.id
+        ) {
+          this.fieldValues.primaryKey = false;
+          this.$message({
+            type: 'error',
+            duration: 3000,
+            message: `${
+              currentFieldWithPrimaryKey.name
+            } is already a primary key. Please adjust that field first.`,
+          });
+        }
         this.fieldValues.foreignKey = null;
         this.fieldValues.foreignCopy = null;
         this.fieldValues.foreignRef = null;
@@ -349,12 +365,10 @@ export default {
     'fieldValues.foreignKey'(value) {
       if (value) {
         const thisRef = this.allFieldValues.filter(
-          field => field.key === value,
+          field => field.id === value,
         )[0];
 
-        this.fieldValues.foreignRef = `${thisRef.collection}/${
-          thisRef.fieldName
-        }`;
+        this.fieldValues.foreignRef = `${thisRef.collection}/${thisRef.name}`;
         this.fieldValues.foreignCopy = null;
       }
     },
@@ -364,13 +378,13 @@ export default {
           return;
         }
         const thisRef = this.allFieldValues.filter(
-          field => field.key === value,
+          field => field.id === value,
         )[0];
         const { key, ...rest } = thisRef;
         this.fieldValues = {
           ...rest,
-          key: this.fieldValues.key,
-          foreignCopy: key,
+          key: this.fieldValues.id,
+          foreignCopy: value,
         };
       }
     },

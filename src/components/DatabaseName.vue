@@ -37,7 +37,7 @@
             :style="{fontSize:  '.8em'}">
             <i class="fa fa-pencil-alt edit-button"
               @click="editMode = !editMode" />
-            <DeletePopover :refKey="database.key"
+            <DeletePopover :refKey="database.id"
               @delete="$emit('delete');selectedDatabaseId = null;">
               <p>Are you sure you want to delete this database and all of it's collections?</p>
             </DeletePopover>

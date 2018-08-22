@@ -1,8 +1,8 @@
 import pluralize from 'pluralize';
-import startCase from 'lodash/startCase';
+import upperFirst from 'lodash/upperFirst';
 
 const generateMatchStatementTop = col => {
-  if (col.parentKey) {
+  if (col.parentId) {
     // * This is a subcollection
     return `\n\t\tmatch\u00A0/${col.parentName}/{${pluralize.singular(
       col.parentName,
@@ -14,12 +14,12 @@ const generateMatchStatementTop = col => {
 };
 
 const getFunctionName = col => {
-  if (col.parentKey) {
-    return `${startCase(pluralize.singular(col.parentName))}${startCase(
+  if (col.parentId) {
+    return `${upperFirst(pluralize.singular(col.parentName))}${upperFirst(
       pluralize.singular(col.name),
     )}`;
   }
-  return startCase(pluralize.singular(col.name));
+  return upperFirst(pluralize.singular(col.name));
 };
 
 export { generateMatchStatementTop, getFunctionName };

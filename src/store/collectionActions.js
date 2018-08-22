@@ -5,7 +5,7 @@ import { sortCollection } from '@/utils';
 
 const checkIfCollectionNameExists = (collections, newCollection) => {
   const existingCollectionWithSameName = collections.filter(
-    col => col.name === newCollection.name,
+    col => col.name === newCollection.name && col.id !== newCollection.id,
   );
 
   if (existingCollectionWithSameName.length) {
@@ -23,22 +23,6 @@ const checkIfCollectionNameExists = (collections, newCollection) => {
   return true;
 };
 
-const checkIfDatabaseNameExists = (databases, databaseName) => {
-  const databasesWithSameName = databases.find(
-    thisDb => thisDb.name === databaseName,
-  );
-  if (databasesWithSameName) {
-    Message({
-      message: `Oops..you already have a database named ${databaseName}.`,
-      type: 'error',
-      duration: 1250,
-      center: true,
-    });
-    return true;
-  }
-  return false;
-};
-
 export default {
   subscribeToCollections(context) {
     return new Promise(resolve => {
@@ -46,16 +30,17 @@ export default {
       const collectionsRef = db
         .collection('collections')
         .where('ownerId', '==', context.rootState.auth.userData.id);
+
       const collectionsCallback = values => {
         this.pending = false;
         let collections = [];
         let subcollections = [];
         if (values.length > 0) {
           collections = values
-            .filter(value => !value.parentKey)
+            .filter(value => !value.parentId)
             .sort(sortCollection);
           subcollections = values
-            .filter(value => value.parentKey)
+            .filter(value => value.parentId)
             .sort(sortCollection);
         }
 
@@ -66,52 +51,22 @@ export default {
       const databasesCallback = values => {
         context.commit('UPDATE_DATABASES', values);
       };
+      const fieldsCallback = values => {
+        context.commit('UPDATE_FIELDS', values);
+      };
+      const fieldsRef = db
+        .collection('fields')
+        .where('ownerId', '==', context.rootState.auth.userData.id);
+
       const databasesRef = db
         .collection('databases')
         .where('ownerId', '==', context.rootState.auth.userData.id);
       subscribe(databasesRef, databasesCallback);
       subscribe(collectionsRef, collectionsCallback);
+      subscribe(fieldsRef, fieldsCallback);
     });
   },
-  addDatabase(context, databaseName) {
-    if (checkIfDatabaseNameExists(context.state.databases, databaseName)) {
-      return;
-    }
 
-    const id = `${databaseName}_${shortid.generate()}`;
-    const dbRef = db.collection('databases').doc(id);
-    create(dbRef, {
-      id,
-      name: databaseName,
-      ownerId: context.rootState.auth.userData.id,
-    });
-  },
-  editDatabaseName(context, newName) {
-    if (checkIfDatabaseNameExists(context.state.databases, newName)) {
-      return;
-    }
-    const dbRef = db
-      .collection('databases')
-      .doc(context.state.selectedDatabaseId);
-    setMerge(dbRef, { name: newName });
-  },
-  deleteDatabase(context) {
-    const batch = db.batch();
-
-    const dbRef = db
-      .collection('databases')
-      .doc(context.state.selectedDatabaseId);
-    batch.delete(dbRef);
-
-    context.state.collections.forEach(col => {
-      if (col.databaseId === context.state.selectedDatabaseId) {
-        const ref = db.collection('collections').doc(col.key);
-        batch.delete(ref);
-      }
-    });
-    context.commit('UPDATE_SELECTED_DATABASE', null);
-    batch.commit().then(() => {});
-  },
   handleTreeChange(context, e) {
     const collectionNames = [];
     context.state.collections.forEach(col => {
@@ -127,28 +82,27 @@ export default {
 
   async addCollection(context, newCollection) {
     const check = checkIfCollectionNameExists(
-      context.state.collections,
+      context.getters.collections,
       newCollection,
     );
     if (!check) {
       return;
     }
-    const generatedKey = `${newCollection.name}-${shortid.generate()}`;
-    // const generatedKey = `${newCollection.name}`;
+    const id = `${newCollection.name}-${shortid.generate()}`;
     const updatedCollection = {
       ...newCollection,
-      key: generatedKey,
+      id,
       fullpath: newCollection.name,
       ownerId: context.rootState.auth.userData.id,
       databaseId: context.state.selectedDatabaseId,
     };
 
-    const dbRef = db.collection('collections').doc(generatedKey);
+    const dbRef = db.collection('collections').doc(id);
     await create(dbRef, updatedCollection);
   },
   async addSubcollection(context, { subcollection, collection }) {
     const collectionsSubcollections = context.state.subcollections.filter(
-      col => col.parentKey === collection.key,
+      col => col.parentId === collection.id,
     );
 
     const existingSubcollectionsWithSameName = collectionsSubcollections
@@ -168,34 +122,37 @@ export default {
       return;
     }
 
-    const generatedKey = `${collection.name}-${
-      subcollection.name
-    }-${shortid.generate()}`;
-    // const generatedKey = `${collection.name}-${subcollection.name}`;
+    const id = `${collection.name}-${subcollection.name}-${shortid.generate()}`;
+
     const updatedSubcollection = {
       ...subcollection,
-      key: generatedKey,
-      parentKey: collection.key,
+      id,
+      parentId: collection.id,
       parentName: collection.name,
       fullpath: `${collection.name}/${subcollection.name}`,
       ownerId: context.rootState.auth.userData.id,
+      databaseId: context.state.selectedDatabaseId,
     };
 
-    const dbRef = db.collection('collections').doc(generatedKey);
+    const dbRef = db.collection('collections').doc(id);
     await create(dbRef, updatedSubcollection);
   },
   handleMoveField(context, { fields, collection }) {
-    const ref = db.collection('collections').doc(collection.key);
-    return setMerge(ref, { fields });
+    const order = [];
+    fields.forEach(field => {
+      order.push(field.id);
+    });
+    const ref = db.collection('collections').doc(collection.id);
+    return setMerge(ref, { fieldOrder: order });
   },
   editCollectionName(context, { collection, newName, type = 'collections' }) {
     // * If collection name -  check against collections
     // * If subcollection name- check against subcollections that belong to
-    // * the same collection (check parentKey)
+    // * the same collection (check parentId)
     const collectionsToCheck =
       type === 'subcollections'
         ? context.state.subcollections.filter(
-            subcol => subcol.parentKey === collection.parentKey,
+            subcol => subcol.parentId === collection.parentId,
           )
         : context.state.collections;
     const check = checkIfCollectionNameExists(collectionsToCheck, {
@@ -205,7 +162,7 @@ export default {
     if (!check) {
       return;
     }
-    const dbRef = db.collection('collections').doc(collection.key);
+    const dbRef = db.collection('collections').doc(collection.id);
     setMerge(dbRef, { name: newName });
   },
   deleteCollection(context, collection) {
@@ -213,7 +170,7 @@ export default {
     // to any properties that were on the deleted subcollection.
     // Oh, also need to deal with all of the subcollections. Or maybe this was a subcollection?
     db.collection('collections')
-      .doc(collection.key)
+      .doc(collection.id)
       .delete();
   },
 };

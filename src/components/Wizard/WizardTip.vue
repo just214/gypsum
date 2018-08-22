@@ -1,7 +1,8 @@
 <template>
-  <div style="margin: 10px auto; width: 80%;">
+  <div style="margin: 10px auto;width: 80%;">
     <el-alert :title="title"
       type="info"
+      show-icon
       center>
     </el-alert>
   </div>
@@ -17,5 +18,3 @@ export default {
 };
 </script>
 
-<style>
-</style>

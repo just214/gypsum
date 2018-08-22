@@ -12,7 +12,7 @@
           <span :style="{fontSize: isSubcollection ? '.8em':'.5em'}">
             <i class="fa fa-pencil-alt edit-button"
               @click="editMode = !editMode" />
-            <DeletePopover :refKey="collection.key"
+            <DeletePopover :refKey="collection.id"
               @delete="$emit('delete',collection)" />
           </span>
 

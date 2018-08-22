@@ -25,19 +25,6 @@
       <el-form :model="collection"
         ref="collectionForm">
 
-        <el-select v-model="copyValues"
-          v-if="allCollections.length"
-          size="mini"
-          style="width: 100%; margin: 8px 0px;"
-          placeholder="Copy from...">
-          <el-option v-for='value in allCollections'
-            :key='value.key'
-            :label="value.parentName ? value.parentName + '/'+value.name : value.name"
-        
-            :value="value">
-          </el-option>
-        </el-select>
-
         <el-form-item prop="collectionName">
           <el-input placeholder="Collection Name"
             ref="nameInput"
@@ -63,17 +50,13 @@
 
 <script>
 import VueTypes from 'vue-types';
-import { one } from 'nouns';
-import pluralize from 'pluralize';
 
 export default {
   props: {
     model: VueTypes.object,
     collections: VueTypes.arrays,
-    allCollections: VueTypes.array,
   },
   data: () => ({
-    copyValues: null,
     showPopover: false,
     collection: {
       name: '',
@@ -87,20 +70,11 @@ export default {
           this.$emit('submit', this.collection);
           this.showPopover = false;
           this.collection.name = '';
-          this.copyValues = null;
         }
       });
     },
   },
   watch: {
-    copyValues(value) {
-      const newKey = this.$genkey();
-      this.collection = {
-        ...value,
-        key: `${value.name}-${newKey}`,
-        name: `${pluralize(one())}`,
-      };
-    },
     showPopover(value) {
       if (value) {
         setTimeout(() => {

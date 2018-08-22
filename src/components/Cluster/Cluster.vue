@@ -1,18 +1,18 @@
 <template>
   <span>
-    <div style="text-align: center">
+    <div style="text-align: center;">
 
       <el-button round
         @click="dialogVisible = true"
         style="margin: 8px 0px;width: 100%;"
         size="mini">
-        <i class="fa fa-project-diagram" />&nbsp;View Cluster
+        <i class="fa fa-project-diagram" />&nbsp;Cluster
       </el-button>
     </div>
     <el-dialog :visible.sync="dialogVisible"
       :modal="false"
       :fullscreen="true">
-      <div style="display: flex; justify-content: center">
+      <div style="display: flex; justify-content: center;">
         <el-slider v-model="sliderValue"
           :show-tooltip="false"
           style="width: 200px"></el-slider>

@@ -32,19 +32,17 @@ const getRules = collections => {
 
     const bottom = '\n\t\t}\n';
 
-    let expression = '';
+    const expression = '';
 
-    if (col.fields && col.fields.length) {
-      col.fields.forEach(thisField => {
-        Object.keys(thisField).forEach(key => {
-          if (thisField[key]) {
-            expression += `data.${thisField.fieldName}${key}${
-              thisField[key]
-            }&&\n\t`;
-          }
-        });
-      });
-    }
+    // if (col.fields && col.fields.length) {
+    //   col.fields.forEach(thisField => {
+    //     Object.keys(thisField).forEach(key => {
+    //       if (thisField[key]) {
+    //         expression += `data.${thisField.name}${key}${thisField[key]}&&\n\t`;
+    //       }
+    //     });
+    //   });
+    // }
 
     const thisFunction = {
       name: `is${getFunctionName(col)}`,

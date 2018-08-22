@@ -6,11 +6,11 @@
     @end="handleDragEnd">
 
     <div v-for="field in collection.fields"
-      :key="field.key"
+      :key="field.id"
       class="field-item"
       @mouseover="$emit('enterField', field);"
       @mouseleave="$emit('exitField', field)"
-      :id="field.key">
+      :id="field.id">
 
       <el-row style="width: 100%;margin-bottom: 8px;overflow: hidden;">
         <div style="display: flex; align-items: center;">
@@ -23,7 +23,7 @@
                 v-if="field.foreignCopy" />
               <i class="fa fa-link small-icon"
                 v-if="field.foreignKey" />
-              <span class="truncate">{{field.fieldName}}</span>
+              <span class="truncate">{{field.name}}</span>
             </span>
           </el-col>
 
@@ -62,12 +62,12 @@
             {{field.dataType}}</span>
         </el-tag>
 
-        <el-tag :key="fieldName"
+        <el-tag :key="name"
           style="margin: 3px;"
           size="mini"
-          v-if="field[fieldName]"
-          v-for="fieldName in tagOptions">
-          {{fieldName}}: {{ field[fieldName] }}</el-tag>
+          v-if="field[name]"
+          v-for="name in tagOptions">
+          {{name}}: {{ field[name] }}</el-tag>
 
         <el-tag style="margin: 3px;"
           size="mini"

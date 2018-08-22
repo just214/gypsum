@@ -99,7 +99,7 @@ export default {
 .nav-button {
   transition: margin-left 0.3s;
   opacity: 0.9;
-  z-index: 100;
+  z-index: 98;
   background-color: var(--gray-1);
   position: fixed;
   top: 20px;
@@ -110,7 +110,7 @@ export default {
   height: 100%;
   width: 0px;
   position: fixed;
-  z-index: 100;
+  z-index: 98;
   top: 0px;
   padding-top: 70px;
   left: 0;

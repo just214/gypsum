@@ -18,7 +18,6 @@
         <SubcollectionForm :collections="collections"
           v-if="addSubcollectionMode"
           @cancel="addSubcollectionMode = false"
-          :allCollections="allCollections"
           :collection="collection"
           @submit="handleAddSubcollection">
         </SubcollectionForm>
@@ -74,7 +73,6 @@ export default {
     collections: VueTypes.array.isRequired,
     collection: VueTypes.object.isRequired,
     allFieldValues: VueTypes.array,
-    allCollections: VueTypes.array,
   },
   components: {
     DeletePopover,
@@ -140,7 +138,7 @@ export default {
       this.addSubcollectionMode = false;
     },
     handleHover(field) {
-      document.getElementById(field.key).style =
+      document.getElementById(field.id).style =
         'background-color: var(--gray-1)';
       if (field.foreignKey) {
         document.getElementById(field.foreignKey).style =
@@ -152,7 +150,7 @@ export default {
       }
     },
     handleExit(field) {
-      document.getElementById(field.key).style = 'border: 1px dashed lightgray';
+      document.getElementById(field.id).style = 'border: 1px dashed lightgray';
       if (field.foreignKey) {
         document.getElementById(field.foreignKey).style =
           'border: 1px dashed lightgray';

@@ -1,13 +1,29 @@
 import isEmpty from 'lodash/isEmpty';
 
-const keysToIgnore = ['fieldName', 'key', 'parentFullPath', 'parentKey'];
+const keysToIgnore = [
+  'name',
+  'collectionId',
+  'collection',
+  'collectionName',
+  'collectionFullpath',
+  'id',
+  'databaseId',
+  'ownerId',
+  'createdAt',
+  'lastModifiedAt',
+  'notes',
+];
 
 const handleFields = fields => {
   // type- tree or cluster
   const arr = [];
+  if (!fields.length) {
+    return arr;
+  }
   fields.forEach((field, i) => {
+    console.log('field', field);
     arr.push({
-      name: field.fieldName,
+      name: field.name,
       children: [],
     });
 
@@ -53,12 +69,19 @@ const getTreeData = (collections, subcollections) => {
 
     if (!isEmpty(subcollections)) {
       subcollections.forEach(subcol => {
-        final[ci].children[1].children.push({
-          name: subcol.name,
-          children: [{ name: 'fields', children: [] }],
-        });
-        if (subcol.parentKey === col.key && !isEmpty(subcol.fields)) {
-          final[ci].children[1].children = handleFields(subcol.fields);
+        if (subcol.parentId === col.id) {
+          final[ci].children[1].children.push({
+            name: subcol.name,
+            children: [{ name: 'fields', children: [] }],
+          });
+          if (subcol.parentId === col.id && !isEmpty(subcol.fields)) {
+            console.log(final[ci].children[1].children[0]);
+            final[
+              ci
+            ].children[1].children[0].children[0].children = handleFields(
+              subcol.fields,
+            );
+          }
         }
       });
     }

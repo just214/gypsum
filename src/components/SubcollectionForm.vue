@@ -4,19 +4,6 @@
     ref="subcollectionForm">
     <b>Add a Subcollection</b>
 
-    <el-select v-model="copyValues"
-      v-if="allCollections.length"
-      size="mini"
-      style="width: 100%; margin: 8px 0px;"
-      placeholder="Copy from..."
-      @change="handleCopy">
-      <el-option v-for='value in allCollections'
-        :key='value.key + value.collection'
-        :value="value"
-        :label="value.parentName ? value.parentName + '/' + value.name : value.name">
-      </el-option>
-    </el-select>
-
     <el-form-item prop="subcollectionName">
       <el-input placeholder="Subcollection Name"
         size="small"
@@ -41,27 +28,20 @@
 
 <script>
 import VueTypes from 'vue-types';
-import cloneDeep from 'lodash/cloneDeep';
 
 export default {
   props: {
     model: VueTypes.object,
     collection: VueTypes.object.isRequired,
     collections: VueTypes.arrays,
-    allCollections: VueTypes.array,
   },
   data: () => ({
-    copyValues: null,
     subcollection: {
       name: '',
     },
   }),
 
   methods: {
-    handleCopy() {
-      this.subcollection = cloneDeep(this.copyValues);
-    },
-
     handleSave() {
       this.$refs.subcollectionForm.validate(valid => {
         if (valid) {

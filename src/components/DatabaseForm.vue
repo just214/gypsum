@@ -1,8 +1,9 @@
 <template>
   <div style="margin: 15px 0px">
-    <el-input v-model.trim="databaseName"
-      clearable
+    <el-input clearable
       size="mini"
+      v-model="databaseName"
+      @keyup.native="handleInputChange"
       :minlength="1"
       :maxlength="40"
       style="width: 60%;margin: 5px;"
@@ -36,6 +37,9 @@ export default {
     handleAdd() {
       this.$emit('add', this.databaseName);
       this.databaseName = '';
+    },
+    handleInputChange(e) {
+      this.databaseName = e.target.value.replace(/\-|\ /g, '');
     },
   },
 };

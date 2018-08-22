@@ -1,6 +1,6 @@
 <template>
-  <div style="padding: 60px;text-align: center;background: var(--gray-9);min-height: 100vh">
-    <el-card style="border-radius: 20px; background-color: var(--gray-2)">
+  <div class="wrapper">
+    <el-card style="border-radius: 20px">
       <el-button type="text"
         @click="$router.go(-1)">Go Back</el-button>
 
@@ -28,15 +28,17 @@
           style="display: inline-block;width: 100%">
           <span v-for="option in availableOptions"
             :key="option">
-            <el-tag style="margin: 5px;">{{option}}</el-tag>
+            <el-tag style="margin: 5px;">{{option}}
+
+            </el-tag>
           </span>
         </div>
 
-        <div v-if="!begin"
+        <div v-if="!inProgress"
           key="beginButton"
           style="margin: 10px;display: inline-block;width: 100%">
 
-          <el-button @click="begin = true"
+          <el-button @click="inProgress = true"
             type="success"
             round
             size="lg">Let's Go!</el-button>
@@ -47,7 +49,7 @@
       <collapse-transition group
         mode="out-in">
 
-        <div v-if="dataRelated === null && begin"
+        <div v-if="dataRelated === null && inProgress"
           key="dataRelated"
           style="display: inline-block;width: 100%">
 
@@ -128,15 +130,17 @@
           <YesNoButtons @yes="queryDataByNestedValues = true"
             @no="queryDataByNestedValues = false" />
         </div>
+
+        <div v-if="finalResult"
+          style="display: inline-block;width: 100%"
+          key="startover">
+          <el-button type="text"
+            @click="startOver">
+            <small>Start Over</small>
+          </el-button>
+        </div>
+
       </collapse-transition>
-      <div v-if="begin"
-        style="display: inline-block;width: 100%"
-        key="startover">
-        <el-button type="text"
-          @click="startOver">
-          <small>Start Over</small>
-        </el-button>
-      </div>
 
     </el-card>
   </div>
@@ -146,6 +150,10 @@
 <script>
 import WizardTip from './WizardTip';
 import YesNoButtons from './YesNoButtons';
+
+/*
+TODO- Fix the animations
+*/
 
 const options = [
   'Root-Level Collection',
@@ -162,7 +170,7 @@ export default {
     YesNoButtons,
   },
   data: () => ({
-    begin: false,
+    inProgress: false,
     dataRelated: null,
     sizeQueryIndiviual: null,
     queryAcross: null,
@@ -231,7 +239,7 @@ export default {
   },
   methods: {
     startOver() {
-      this.begin = false;
+      this.inProgress = false;
       this.dataRelated = null;
       this.sizeQueryIndiviual = null;
       this.queryAcross = null;
@@ -248,5 +256,13 @@ export default {
 <style scoped>
 .caption {
   color: var(--warning);
+}
+
+.wrapper {
+  padding: 10px;
+  padding-top: 50px;
+  text-align: center;
+  background: var(--gray-1);
+  min-height: 100vh;
 }
 </style>

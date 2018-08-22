@@ -6,7 +6,7 @@ import store from '@/store';
 // * Components
 import AuthPage from '@/components/Auth/AuthPage';
 import SchemaPage from '@/components/SchemaPage';
-import DataWizard from '@/components/DataWizard';
+import WizardPage from '@/components/Wizard/WizardPage';
 
 Vue.use(Router);
 
@@ -31,8 +31,8 @@ const router = new Router({
     },
     {
       path: '/wizard',
-      name: 'DataWizard',
-      component: DataWizard,
+      name: 'WizardPage',
+      component: WizardPage,
       meta: { requiresRegistration: true },
     },
   ],

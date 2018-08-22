@@ -7,8 +7,8 @@
     placeholder="Copy from..."
     @change="e => $emit('change', fieldValue)">
     <el-option v-for='value in allFieldValues'
-      :key='value.key + value.collection + value.fieldName'
-      :label="value.collection + '/' + value.fieldName"
+      :key='value.id + value.collectionFullpath + value.name'
+      :label="value.collectionFullpath + '/' + value.name"
       :value="value">
     </el-option>
   </el-select>
