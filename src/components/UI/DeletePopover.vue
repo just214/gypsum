@@ -27,10 +27,14 @@
 
 <script>
 import VueTypes from 'vue-types';
+// ! Not sure what this is about.
+import shortid from 'shortid';
+
+const autoRefKey = shortid.generate();
 
 export default {
   props: {
-    refKey: VueTypes.string.def(Math.random()),
+    refKey: VueTypes.string.def(autoRefKey),
   },
   data: () => ({
     visible: {},

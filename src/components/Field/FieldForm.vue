@@ -10,9 +10,11 @@
       size="small"
       ref="nameInput"
       @keyup.enter.native="handleSave"
+      v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
       v-model="fieldValues.name" />
 
     <el-select v-model="fieldValues.dataType"
+      v-if="!ui.isForeignCopy"
       filterable
       clearable
       size="mini"
@@ -24,61 +26,73 @@
       </el-option>
     </el-select>
 
-    <el-select v-model="fieldValues.foreignKey"
-      clearable
-      size="mini"
-      style="width: 100%; margin: 4px 0px;"
-      v-if="allFieldValues.length"
-      placeholder="Foreign Key">
-      <el-option v-for='value in allFieldValues'
-        :key='value.id + value.collection'
-        :label="value.collection + '/' + value.name"
-        :value="value.id">
-      </el-option>
-    </el-select>
+    <el-row style="margin-top: 10px;">
 
-    <el-select v-model="fieldValues.foreignCopy"
-      clearable
-      size="mini"
-      style="width: 100%; margin: 4px 0px;"
-      v-if="allFieldValues.length"
-      placeholder="Foreign Copy">
-      <el-option v-for='value in allFieldValues'
-        :key='value.id + value.collection'
-        :label="value.collection + '/' + value.name"
-        :value="value.id">
-      </el-option>
-    </el-select>
-
-    <div style="margin:4px 0px;">
-      <el-input placeholder="Example"
-        ref="example"
-        size="mini"
-        v-model="fieldValues.example" />
-    </div>
-
-    <el-row justify="center"
-      style="margin-top: 10px;">
       <el-col :span="12">
-
         <el-switch v-model="fieldValues.primaryKey">
         </el-switch>
+
         <small :style="{color: fieldValues.primaryKey
               ? 'var(--primary)'
-              : 'var(--gray-5)'}">&nbsp;Primary Key</small>
+              : 'var(--gray-5)'}">&nbsp;&nbsp;Primary Key</small>
 
       </el-col>
-      <el-col :span="12">
 
+      <el-col :span="12">
         <el-switch v-model="fieldValues.required">
         </el-switch>
         <small :style="{color: fieldValues.required
               ? 'var(--primary)'
-              : 'var(--gray-5)'}">&nbsp;Required</small>
+              : 'var(--gray-5)'}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Required</small>
+
+      </el-col>
+    </el-row>
+    <el-row style="margin-top: 10px;">
+
+      <el-col :span="12">
+        <el-switch v-model="ui.isForeignCopy" />
+        <small :style="{color: ui.isForeignCopy
+              ? 'var(--primary)'
+              : 'var(--gray-5)',width: '70px'}">&nbsp;Foreign Copy</small>
+
+      </el-col>
+
+      <el-col :span="12">
+        <el-switch v-model="ui.isForeignKey" />
+        <small :style="{color: ui.isForeignKey
+              ? 'var(--primary)'
+              : 'var(--gray-5)'}">&nbsp;Foreign Key</small>
 
       </el-col>
     </el-row>
 
+    <zoom-center-transition mode="out-in">
+      <el-select v-model="fieldValues.foreignCopy"
+        v-if="ui.isForeignCopy && allFieldValues.length"
+        clearable
+        size="mini"
+        style="width: 100%; margin: 4px 0px;"
+        placeholder="Foreign Copy">
+        <el-option v-for='value in allFieldValues'
+          :key='value.id + value.collectionFullpath'
+          :label="value.collectionFullpath + '/' + value.name"
+          :value="value.id">
+        </el-option>
+      </el-select>
+
+      <el-select v-model="fieldValues.foreignKey"
+        v-if="ui.isForeignKey && allFieldValues.length"
+        clearable
+        size="mini"
+        style="width: 100%; margin: 4px 0px;"
+        placeholder="Foreign Key">
+        <el-option v-for='value in allFieldValues'
+          :key='value.id + value.collectionFullpath'
+          :label="value.collectionFullpath + '/' + value.name"
+          :value="value.id">
+        </el-option>
+      </el-select>
+    </zoom-center-transition>
     <zoom-center-transition mode="out-in">
 
       <div style="margin: 5px;"
@@ -114,14 +128,14 @@
             <small>min</small>
             <el-input-number v-model="fieldValues.min"
               size="mini"
-              style="width: 100%; margin: 4px 0px;"
-              :min="0"></el-input-number>
+              :min="0"
+              style="width: 100%; margin: 4px 0px;"></el-input-number>
           </el-col>
           <el-col :span="12">
             <small>max</small>
             <el-input-number v-model="fieldValues.max"
-              :min="0"
               size="mini"
+              :min="0"
               style="width: 100%; margin: 4px 0px;"></el-input-number>
           </el-col>
         </el-row>
@@ -198,6 +212,13 @@
       </div>
     </zoom-center-transition>
 
+    <div style="margin:10px 0px;">
+      <el-input placeholder="Example"
+        ref="example"
+        size="mini"
+        v-model="fieldValues.example" />
+    </div>
+
     <div style="margin-top: 10px">
       <el-input v-model="fieldValues.notes"
         type="textarea"
@@ -224,8 +245,10 @@
 <script>
 import VueTypes from 'vue-types';
 import cloneDeep from 'lodash/cloneDeep';
+import upperFirst from 'lodash/upperFirst';
 import isEmpty from 'lodash/isEmpty';
-import CopySelect from './CopySelect';
+import pluralize from 'pluralize';
+import CopySelect from '@/components/UI/CopySelect';
 
 const INITIAL_FIELD_VALUES = {
   dataType: '',
@@ -239,9 +262,11 @@ const INITIAL_FIELD_VALUES = {
   arrayMinLength: null,
   arrayMaxLength: null,
   enums: [],
+  primaryKey: null,
   foreignKey: null,
-  foreignRef: null,
+  foreignKeyRef: null,
   foreignCopy: null,
+  foreignCopyRef: null,
   example: '',
   match: '',
   // string
@@ -268,6 +293,10 @@ export default {
     }
   },
   data: () => ({
+    ui: {
+      isForeignKey: false,
+      isForeignCopy: false,
+    },
     enumInputVisible: false,
     inputValue: '',
     fieldValues: INITIAL_FIELD_VALUES,
@@ -328,6 +357,7 @@ export default {
           this.clearForm();
         }
       };
+
       this.$emit('submit', this.fieldValues, callback);
       this.inputValue = '';
       this.showInput = false;
@@ -341,6 +371,8 @@ export default {
   watch: {
     'fieldValues.primaryKey'(value) {
       if (value) {
+        this.ui.isForeignKey = false;
+        this.ui.isForeignCopy = false;
         const currentFieldWithPrimaryKey = this.collection.fields.find(
           field => field.primaryKey,
         );
@@ -348,7 +380,7 @@ export default {
           currentFieldWithPrimaryKey &&
           currentFieldWithPrimaryKey.id !== this.fieldValues.id
         ) {
-          this.fieldValues.primaryKey = false;
+          this.fieldValues.primaryKey = null;
           this.$message({
             type: 'error',
             duration: 3000,
@@ -357,35 +389,72 @@ export default {
             } is already a primary key. Please adjust that field first.`,
           });
         }
-        this.fieldValues.foreignKey = null;
-        this.fieldValues.foreignCopy = null;
-        this.fieldValues.foreignRef = null;
       }
     },
     'fieldValues.foreignKey'(value) {
       if (value) {
+        this.ui.isForeignCopy = false;
+        this.ui.isForeignKey = true;
+
         const thisRef = this.allFieldValues.filter(
           field => field.id === value,
         )[0];
 
-        this.fieldValues.foreignRef = `${thisRef.collection}/${thisRef.name}`;
+        this.fieldValues.foreignKeyRef = `${thisRef.collectionFullpath}/${
+          thisRef.name
+        }`;
+        this.fieldValues.name = `${pluralize.singular(
+          thisRef.collectionFullpath,
+        )}${upperFirst(thisRef.name)}`;
         this.fieldValues.foreignCopy = null;
+      }
+    },
+    'ui.isForeignKey'(value) {
+      if (value) {
+        this.ui.isForeignCopy = false;
+        this.fieldValues.primaryKey = null;
+        this.fieldValues.foreignCopy = null;
+        this.fieldValues.foreignCopyRef = null;
+      } else {
+        this.fieldValues.foreignKey = null;
+        this.fieldValues.foreignKeyRef = null;
+      }
+    },
+    'ui.isForeignCopy'(value) {
+      if (value) {
+        this.ui.isForeignCopy = true;
+        this.ui.isForeignKey = false;
+        this.fieldValues.primaryKey = null;
+        this.fieldValues.foreignKey = null;
+        this.fieldValues.foreignKeyRef = null;
+      } else {
+        this.fieldValues.foreignCopy = null;
+        this.fieldValues.foreignCopyRef = null;
       }
     },
     'fieldValues.foreignCopy'(value) {
       if (value) {
-        if (this.fieldValues.foreignCopy === value) {
-          return;
-        }
+        this.ui.isForeignKey = false;
+        this.ui.isForeignCopy = true;
+
         const thisRef = this.allFieldValues.filter(
           field => field.id === value,
         )[0];
         const { key, ...rest } = thisRef;
+
         this.fieldValues = {
+          ...this.fieldValues,
           ...rest,
-          key: this.fieldValues.id,
+          name: `${pluralize.singular(thisRef.collectionFullpath)}${upperFirst(
+            thisRef.name,
+          )}`,
+          id: this.fieldValues.id,
           foreignCopy: value,
         };
+
+        this.fieldValues.foreignCopyRef = `${thisRef.collectionFullpath}/${
+          thisRef.name
+        }`;
       }
     },
     'fieldValues.dataType'(value, oldValue) {

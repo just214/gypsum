@@ -1,23 +1,22 @@
 <template>
-  <SchemaLayout :showSideNavAtStartup="!!allCollections.length">
+  <MainLayout :showSideNavAtStartup="!!allCollections.length">
     <template slot="nav-items">
 
       <zoom-center-transition>
         <div v-if="allCollections.length">
-          <RulesDialog :rules="getRules(allCollections, allFieldValues)" />
-          <Cluster :tree="clusterData"
-            :count="allFieldValues.length" />
+          <Link to="/rules"
+            title="Rules"
+            icon="fa-pencil-ruler" />
+          <Link to="/cluster"
+            title="Cluster"
+            icon="fa-project-diagram" />
         </div>
       </zoom-center-transition>
 
-      <div style="text-align: center">
-        <router-link to="/wizard">
-          <el-button round
-            size="mini"
-            style=" width: 100%">
-            <i class="fa fa-magic" />&nbsp;Wizard</el-button>
-        </router-link>
-      </div>
+      <Link to="/wizard"
+        title="Wizard"
+        icon="fa-magic" />
+
       <div style="text-align: center;margin-top: 5px;">
         <el-button round
           size="mini"
@@ -47,7 +46,7 @@
         @edit="newName => editDatabaseName(newName)"
         @selected="handleSelectedDatabase" />
 
-      <zoom-center-transition mode="out-in">
+      <fade-transition mode="out-in">
 
         <div v-if="!databases.length && readyForTextAnimation"
           class="title-wrapper">
@@ -64,11 +63,15 @@
 
         <div v-if=" readyForTextAnimation && databases.length && !selectedDatabaseId"
           class="title-wrapper">
-          <h1 style="padding: 0px; margin: 0px">
-            <b>Welcome to</b>
+
+          <i class="fa fa-arrow-up fa-5x arrow" />
+
+          <h1>Welcome back to
+            <span style="font-family: 'Sigmar One', cursive;font-size: 2em;">Gypsum</span>
           </h1>
-          <h1 class="title-text">Gypsum</h1>
-          <h3 style="color: var(--gray-5)">Select or create a database in the select box above to start designing.</h3>
+
+          <h3 style="color: var(--gray-5)">Select or create a database in the select box above to start modeling your
+            next great project!</h3>
         </div>
 
         <div v-if="!allCollections.length 
@@ -84,7 +87,7 @@
             <i class="fa fa-plus"
               style="font-size: 25px;" /> icon to add your first collection!</h3>
         </div>
-      </zoom-center-transition>
+      </fade-transition>
 
       <transition name="slide"
         mode="out-in">
@@ -190,42 +193,38 @@
 
       </div>
     </div>
-  </SchemaLayout>
+  </MainLayout>
 </template>
 
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-import { getRules } from '@/utils';
-import SchemaLayout from './SchemaLayout';
-import CollectionForm from './CollectionForm';
-import CollectionCard from './CollectionCard';
-import RulesDialog from './Rules/RulesDialog';
-import RulesForm from './Rules/RulesForm';
-import Cluster from './Cluster/Cluster';
-import DeletePopover from './DeletePopover';
-import CollectionName from './CollectionName';
-import DatabaseForm from './DatabaseForm';
-import DatabaseName from './DatabaseName';
+import MainLayout from '@/components/MainLayout';
+import CollectionForm from '@/components/Collection/CollectionForm';
+import CollectionCard from '@/components/Collection/CollectionCard';
+import RulesForm from '@/components/Rules/RulesForm';
+import DeletePopover from '@/components/UI/DeletePopover';
+import CollectionName from '@/components/Collection/CollectionName';
+import DatabaseForm from '@/components/Database/DatabaseForm';
+import DatabaseName from '@/components/Database/DatabaseName';
+import Link from '@/components/UI/Link';
 
 export default {
   components: {
+    MainLayout,
     CollectionForm,
     CollectionCard,
-    RulesDialog,
-    SchemaLayout,
     RulesForm,
-    Cluster,
     DeletePopover,
     CollectionName,
     DatabaseForm,
     DatabaseName,
+    Link,
   },
   data: () => ({
     pending: false,
     treeSelection: '',
     bgColor: '',
     editMode: false,
-    getRules,
     readyForAnimation: false,
     readyForTextAnimation: false,
     databaseName: '',
@@ -237,7 +236,6 @@ export default {
       'subcollections',
       'allFieldValues',
       'treeData',
-      'clusterData',
       'sortedCollectionsByTreeSelection',
       'allCollections',
       'selectedDatabaseName',
@@ -306,7 +304,7 @@ export default {
 
 .title-wrapper {
   text-align: center;
-  margin-top: 150px;
+  margin-top: 75px;
   height: 100%;
   position: fixed;
   transform: translateX(-50%);
@@ -364,5 +362,23 @@ export default {
   background-color: var(--gray-2);
   margin: 10px 0px;
   border-radius: 20px;
+}
+
+.arrow {
+  animation: MoveUpDown 1s linear infinite;
+  position: relative;
+  left: 0;
+  bottom: 0;
+  color: var(--warning);
+}
+
+@keyframes MoveUpDown {
+  0%,
+  100% {
+    bottom: 0;
+  }
+  50% {
+    bottom: 10px;
+  }
 }
 </style>

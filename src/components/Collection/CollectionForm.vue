@@ -29,6 +29,7 @@
           <el-input placeholder="Collection Name"
             ref="nameInput"
             size="small"
+            v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
             v-model="collection.name" />
         </el-form-item>
 

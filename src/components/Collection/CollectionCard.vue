@@ -61,11 +61,11 @@
 <script>
 import VueTypes from 'vue-types';
 
-import DeletePopover from './DeletePopover';
-import SubcollectionForm from './SubcollectionForm';
-import FieldForm from './FieldForm';
-import FieldItems from './FieldItems';
-import CollectionName from './CollectionName';
+import DeletePopover from '@/components/UI/DeletePopover';
+import CollectionName from '@/components/Collection/CollectionName';
+import SubcollectionForm from '@/components/Collection/SubcollectionForm';
+import FieldForm from '@/components/Field/FieldForm';
+import FieldItems from '@/components/Field/FieldItems';
 
 export default {
   props: {

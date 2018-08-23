@@ -27,10 +27,32 @@ const fieldAlreadyExists = (newField, collection) => {
   return false;
 };
 
+const removeEmptyProperties = (field, collection) => {
+  const newField = {};
+  Object.keys(field).forEach(key => {
+    if (key === 'enums') {
+      if (!field[key].length) {
+        return;
+      }
+    } else if (!field[key]) {
+      if (field.id) {
+        const collectionField = collection.fields.find(f => f.id === field.id);
+        if (collectionField[key]) {
+          newField[key] = null;
+        }
+      }
+
+      return;
+    }
+    newField[key] = field[key];
+  });
+  return newField;
+};
+
 export default {
   addField(context, { field, collection, callback }) {
     // TODO -  The callback is for UI only. Switch to promise if possible since $emitters.
-
+    const modifiedField = removeEmptyProperties(field, collection);
     /*
     * This addField method is responsible for:
     * - Adding the new field to the field collection with the collection's data...
@@ -45,7 +67,7 @@ export default {
     const id = `${field.name}_${shortid.generate()}`;
 
     const updatedField = {
-      ...field,
+      ...modifiedField,
 
       id,
       collectionId: collection.id,
@@ -76,22 +98,16 @@ export default {
   },
 
   editField(context, { field, collection, callback }) {
+    const modifiedField = removeEmptyProperties(field, collection);
+
     if (fieldAlreadyExists(field, collection)) {
       return;
     }
-    const newFields = collection.fields.map(f => {
-      if (f.id === field.id) {
-        return field;
-      }
-      return f;
-    });
-    const dbRef = db.collection('collections').doc(collection.id);
-    setMerge(dbRef, { fields: newFields }).then(() => {
-      callback();
-    });
 
     const fieldRef = db.collection('fields').doc(field.id);
-    setMerge(fieldRef, field);
+    setMerge(fieldRef, modifiedField).then(() => {
+      callback();
+    });
   },
   async deleteField(context, { field, collection }) {
     // * This method is responsible for:
@@ -130,7 +146,7 @@ export default {
           ref,
           {
             [`${type}`]: null,
-            foreignRef: null,
+            [`${type}Ref`]: null,
           },
           { merge: true },
         );
@@ -158,7 +174,6 @@ export default {
 
           if (foreignKeyReferences.length) {
             foreignKeyReferences.forEach(ref => {
-              console.log('REF', ref);
               foreignKeyRefNames = foreignKeyRefNames.concat(
                 `${ref.collectionFullpath}/${ref.name}  `,
               );
@@ -172,7 +187,6 @@ export default {
 
           if (foreignCopyReferences.length) {
             foreignCopyReferences.forEach(ref => {
-              console.log('REF', ref);
               foreignCopyRefNames = foreignCopyRefNames.concat(
                 `${ref.collectionFullpath}/${ref.name}  `,
               );

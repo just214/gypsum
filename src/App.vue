@@ -3,13 +3,8 @@
 </template>
 
 <script>
-import SchemaPage from './components/SchemaPage';
-
 export default {
   name: 'app',
-  components: {
-    SchemaPage,
-  },
 };
 </script>
 

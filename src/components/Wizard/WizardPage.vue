@@ -1,8 +1,7 @@
 <template>
   <div class="wrapper">
     <el-card style="border-radius: 20px">
-      <el-button type="text"
-        @click="$router.go(-1)">Go Back</el-button>
+      <GoBackButton />
 
       <zoom-center-transition group
         mode="out-in">
@@ -46,7 +45,7 @@
         </div>
       </zoom-center-transition>
 
-      <collapse-transition group
+      <fade-transition group
         mode="out-in">
 
         <div v-if="dataRelated === null && inProgress"
@@ -140,7 +139,7 @@
           </el-button>
         </div>
 
-      </collapse-transition>
+      </fade-transition>
 
     </el-card>
   </div>
@@ -148,12 +147,9 @@
 
 
 <script>
+import GoBackButton from '@/components/UI/GoBackButton';
 import WizardTip from './WizardTip';
 import YesNoButtons from './YesNoButtons';
-
-/*
-TODO- Fix the animations
-*/
 
 const options = [
   'Root-Level Collection',
@@ -168,6 +164,7 @@ export default {
   components: {
     WizardTip,
     YesNoButtons,
+    GoBackButton,
   },
   data: () => ({
     inProgress: false,

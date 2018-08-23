@@ -1,4 +1,8 @@
-import { generateMatchStatementTop, getFunctionName } from './utils';
+import {
+  generateMatchStatementTop,
+  getFunctionName,
+  handleDataType,
+} from './utils';
 
 const getRules = collections => {
   if (!collections.length) {
@@ -17,6 +21,33 @@ const getRules = collections => {
     { name: 'getAuthId', expression: 'return request.auth.uid;' },
     { name: 'existingData', expression: 'return resource.data;' },
     { name: 'incomingData', expression: 'return request.resource.data;' },
+    { name: 'isNull', expression: 'return value == null;', arg: 'value' },
+    {
+      name: 'isString',
+      expression: 'return isNull(value) || value is string;',
+      arg: 'value',
+    },
+    {
+      name: 'isNumber',
+      expression: 'return isNull(value) || value is number;',
+      arg: 'value',
+    },
+    {
+      name: 'isInt',
+      expression: 'return isNull(value) || value is int;',
+      arg: 'value',
+    },
+    {
+      name: 'isFloat',
+      expression: 'return isNull(value) || value is float;',
+      arg: 'value',
+    },
+
+    {
+      name: 'isTimestamp',
+      expression: 'return isNull(value) || value is timestamp',
+      arg: 'value',
+    },
   ];
 
   const middleStuff = [];
@@ -32,21 +63,26 @@ const getRules = collections => {
 
     const bottom = '\n\t\t}\n';
 
-    const expression = '';
+    let expression = '';
 
-    // if (col.fields && col.fields.length) {
-    //   col.fields.forEach(thisField => {
-    //     Object.keys(thisField).forEach(key => {
-    //       if (thisField[key]) {
-    //         expression += `data.${thisField.name}${key}${thisField[key]}&&\n\t`;
-    //       }
-    //     });
-    //   });
-    // }
+    if (col.fields && col.fields.length) {
+      col.fields.forEach(thisField => {
+        if (thisField.dataType) {
+          console.log(thisField.dataType);
+          expression += handleDataType(thisField);
+        }
+        // Object.keys(thisField).forEach(key => {
+        //   if (thisField[key]) {
+        //     expression += `data.${thisField.name}${key}${thisField[key]}&&\n\t`;
+        //   }
+        // });
+      });
+    }
 
     const thisFunction = {
       name: `is${getFunctionName(col)}`,
       expression,
+      arg: 'data',
     };
 
     helperFunctions.push(thisFunction);

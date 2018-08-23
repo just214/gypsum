@@ -22,4 +22,11 @@ const getFunctionName = col => {
   return upperFirst(pluralize.singular(col.name));
 };
 
-export { generateMatchStatementTop, getFunctionName };
+const handleDataType = field => {
+  if (field.dataType === 'string') {
+    return 'return isString(incomingData())';
+  }
+  return '';
+};
+
+export { generateMatchStatementTop, getFunctionName, handleDataType };

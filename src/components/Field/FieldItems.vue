@@ -19,9 +19,9 @@
             <span style="margin: 0px 5px;overflow: hidden;display: flex; align-items: center;">
               <i class="fa fa-key small-icon"
                 v-if="field.primaryKey" />
-              <i class="fa fa-clone small-icon"
+              <i class="fa fa-link smaller-icon"
                 v-if="field.foreignCopy" />
-              <i class="fa fa-link small-icon"
+              <i class="fa fa-key smaller-icon"
                 v-if="field.foreignKey" />
               <span class="truncate">{{field.name}}</span>
             </span>
@@ -89,8 +89,14 @@
 
         <el-tag style="margin: 3px;"
           size="mini"
-          v-if="field.foreignKey">
-          ref: {{ field.foreignRef }}
+          v-if="field.foreignKeyRef">
+          ref: {{ field.foreignKeyRef }}
+        </el-tag>
+
+        <el-tag style="margin: 3px;"
+          size="mini"
+          v-if="field.foreignCopyRef">
+          ref: {{ field.foreignCopyRef }}
         </el-tag>
 
         <el-tag size="mini"
@@ -113,7 +119,7 @@
 import VueTypes from 'vue-types';
 import draggable from 'vuedraggable';
 import isEqual from 'lodash/isEqual';
-import NotesPopover from './NotesPopover';
+import NotesPopover from '@/components/Field/NotesPopover';
 
 export default {
   props: {
@@ -179,6 +185,11 @@ export default {
 .small-icon {
   font-size: 12px;
   color: var(--primary);
+  margin-right: 5px;
+}
+.smaller-icon {
+  font-size: 10px;
+  color: var(--info);
   margin-right: 5px;
 }
 </style>

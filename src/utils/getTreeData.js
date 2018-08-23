@@ -21,7 +21,6 @@ const handleFields = fields => {
     return arr;
   }
   fields.forEach((field, i) => {
-    console.log('field', field);
     arr.push({
       name: field.name,
       children: [],
@@ -75,7 +74,6 @@ const getTreeData = (collections, subcollections) => {
             children: [{ name: 'fields', children: [] }],
           });
           if (subcol.parentId === col.id && !isEmpty(subcol.fields)) {
-            console.log(final[ci].children[1].children[0]);
             final[
               ci
             ].children[1].children[0].children[0].children = handleFields(

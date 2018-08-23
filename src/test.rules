@@ -8,3 +8,5 @@ match /messages/{messageId} {
   allow create: if request.resource.data.size == 4;
       && request.resource.data
 }
+
+

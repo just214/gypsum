@@ -5,8 +5,10 @@ import store from '@/store';
 
 // * Components
 import AuthPage from '@/components/Auth/AuthPage';
-import SchemaPage from '@/components/SchemaPage';
+import MainPage from '@/components/MainPage';
 import WizardPage from '@/components/Wizard/WizardPage';
+import RulesPage from '@/components/Rules/RulesPage';
+import ClusterPage from '@/components/Cluster/ClusterPage';
 
 Vue.use(Router);
 
@@ -26,13 +28,25 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: SchemaPage,
+      component: MainPage,
       meta: { requiresRegistration: true },
     },
     {
       path: '/wizard',
       name: 'WizardPage',
       component: WizardPage,
+      meta: { requiresRegistration: true },
+    },
+    {
+      path: '/rules',
+      name: 'RulesPage',
+      component: RulesPage,
+      meta: { requiresRegistration: true },
+    },
+    {
+      path: '/cluster',
+      name: 'ClusterPage',
+      component: ClusterPage,
       meta: { requiresRegistration: true },
     },
   ],

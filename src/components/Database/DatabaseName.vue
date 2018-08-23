@@ -7,19 +7,24 @@
 
         <span v-if="!editMode"
           style="display: flex; align-items: center;width: 300px;">
+
           <el-select v-model="selectedDatabaseId"
             placeholder="Select a database"
             size="mini"
             style="width: 60%">
+
             <el-option v-for="db in $store.state.databases"
               style="width: 200px"
               :key="db.id"
               :label="db.name"
               :value="db.id">
+
             </el-option>
+
             <div style="margin:0px">
               <el-input v-model.trim="databaseName"
                 clearable
+                v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
                 size="mini"
                 :minlength="1"
                 :maxlength="40"
@@ -68,7 +73,7 @@
 
 <script>
 import VueTypes from 'vue-types';
-import DeletePopover from './DeletePopover';
+import DeletePopover from '@/components/UI/DeletePopover';
 
 export default {
   props: {

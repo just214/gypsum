@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/en';
 import VueMq from 'vue-mq';
 import Transitions from 'vue2-transitions';
+import VueTheMask from 'vue-the-mask';
 import 'element-ui/lib/theme-chalk/display.css';
 import '@/firebase';
 import router from '@/router';
@@ -18,6 +19,7 @@ genkey.install = () => {
 };
 Vue.use(require('vue-shortkey'));
 
+Vue.use(VueTheMask);
 Vue.use(ElementUI, { locale });
 Vue.use(VueClipboard);
 Vue.use(genkey);

@@ -3,9 +3,8 @@
     <el-input clearable
       size="mini"
       v-model="databaseName"
-      @keyup.native="handleInputChange"
+      v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
       :minlength="1"
-      :maxlength="40"
       style="width: 60%;margin: 5px;"
       @keyup.enter.native="handleAdd"
       placeholder="New database" />

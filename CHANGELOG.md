@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 **TYPES OF CHANGES: Added, Changed, Deprecated, Removed, Fixed, Security**
 
+## [Unreleased]- 08-22-2018
+
+### Changed
+
+- Organized components into sub-folders.
+- Fixed a few small bugs.
+- Moved Wizard, Rules, and Cluster to respective routes (originally full-page modals)
+
+### Fixed
+
+- Fixed issue where empty field properties were being saved.
+
 ## [Unreleased]- 08-21-2018
 
 ### Changed
