@@ -36,9 +36,7 @@ export default {
       state.pending = false;
       state.error = payload;
     },
-    [SIGN_OUT](state) {
-      console.log(state);
-    },
+    [SIGN_OUT]() {},
   },
 
   actions: {

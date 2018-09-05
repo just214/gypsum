@@ -14,7 +14,7 @@ module.exports = {
     'object-shorthand': 'off',
     'import/prefer-default-export': 'off',
     // prettier-ignore
-    'indent': 'off',
+    indent: 'off',
     'no-param-reassign': 'off',
     'max-len': 'off',
     'no-useless-escape': 'off',

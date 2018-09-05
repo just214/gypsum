@@ -17,6 +17,14 @@
         title="Wizard"
         icon="fa-magic" />
 
+      <Link to="/terminology"
+        title="Terminology"
+        icon="fa-book" />
+
+      <Link to="/cheatsheets"
+        title="Cheatsheets"
+        icon="fa-book" />
+
       <div style="text-align: center;margin-top: 5px;">
         <el-button round
           size="mini"
@@ -54,6 +62,7 @@
             <b>Welcome to</b>
           </h1>
           <h1 class="title-text">Gypsum</h1>
+          <h3 style="color:var(--warning)">A Firestore Data Management Tool</h3>
           <h3 style="color: var(--gray-5)">Let's start by adding your first database.</h3>
           <DatabaseForm @add="databaseName => $store.dispatch('addDatabase', databaseName)"
         
@@ -64,14 +73,14 @@
         <div v-if=" readyForTextAnimation && databases.length && !selectedDatabaseId"
           class="title-wrapper">
 
-          <i class="fa fa-arrow-up fa-5x arrow" />
+          <i class="fa fa-arrow-up fa-3x arrow" />
 
           <h1>Welcome back to
             <span style="font-family: 'Sigmar One', cursive;font-size: 2em;">Gypsum</span>
           </h1>
+          <h3 style="color:var(--warning)">A Firestore Data Management Tool</h3>
 
-          <h3 style="color: var(--gray-5)">Select or create a database in the select box above to start modeling your
-            next great project!</h3>
+          <h3 style="color: var(--gray-5)">Select or create a database in the select box above to get started!</h3>
         </div>
 
         <div v-if="!allCollections.length 

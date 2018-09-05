@@ -1,0 +1,34 @@
+service cloud.firestore {
+  function isAuthed(request) {
+    return request.auth != null;
+  }
+
+  function incomingData(request) {
+    return request.resource.data
+  }
+    
+  function getAuthId(request) {
+    return request.auth.uid;
+  }
+  
+  function docBelongsToUser(resource,request) {
+    return getAuthId(request) == incomingData(request).ownerId
+    || getAuthId(request) == resource.data.ownerId
+  }
+  
+  match /databases/{database}/documents {
+     match /databases/{databaseId} {
+    	allow create: if isAuthed(request);
+      allow read, update, delete: if docBelongsToUser(resource, request);
+    }
+    match /fields/{fieldId} {
+    	allow create: if isAuthed(request);
+      allow read, update, delete: if docBelongsToUser(resource, request);
+    }
+    match /collections/{collectionId} {
+    	allow create: if isAuthed(request);
+      allow read, update, delete: if docBelongsToUser(resource, request);
+    }
+  }
+  
+}

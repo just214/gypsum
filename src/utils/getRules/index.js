@@ -68,7 +68,6 @@ const getRules = collections => {
     if (col.fields && col.fields.length) {
       col.fields.forEach(thisField => {
         if (thisField.dataType) {
-          console.log(thisField.dataType);
           expression += handleDataType(thisField);
         }
         // Object.keys(thisField).forEach(key => {

@@ -1,147 +1,146 @@
 <template>
   <div class="wrapper">
-    <el-card style="border-radius: 20px">
-      <GoBackButton />
 
-      <zoom-center-transition group
-        mode="out-in">
+    <GoBackButton />
 
-        <div v-if="!finalResult"
-          style="display: inline-block;width: 100%"
-          key="intro">
-          <div>
+    <zoom-center-transition group
+      mode="out-in">
 
-            <h3>
-              <i class="fa fa-magic caption" />&nbsp;Let's try to narrow down which of the following data structures
-              is best suited for the data you have in mind.</h3>
-          </div>
-        </div>
+      <div v-if="!finalResult"
+        style="display: inline-block;width: 100%"
+        key="intro">
+        <div>
 
-        <div v-else
-          style="display: inline-block;width: 100%"
-          key="finalResult">
-          <p class="caption">The final result is:</p>
-        </div>
-
-        <div key="options"
-          style="display: inline-block;width: 100%">
-          <span v-for="option in availableOptions"
-            :key="option">
-            <el-tag style="margin: 5px;">{{option}}
-
-            </el-tag>
-          </span>
-        </div>
-
-        <div v-if="!inProgress"
-          key="beginButton"
-          style="margin: 10px;display: inline-block;width: 100%">
-
-          <el-button @click="inProgress = true"
-            type="success"
-            round
-            size="lg">Let's Go!</el-button>
-
-        </div>
-      </zoom-center-transition>
-
-      <fade-transition group
-        mode="out-in">
-
-        <div v-if="dataRelated === null && inProgress"
-          key="dataRelated"
-          style="display: inline-block;width: 100%">
-
-          <div>
-            <h3>Is this data related to a parent collection?</h3>
-            <WizardTip title='If a user has many phone numbers, the answer would be "No" for
-        users and "Yes" for phone numbers.' />
-            <YesNoButtons @yes="dataRelated = true"
-              @no="dataRelated = false" />
-          </div>
-
-        </div>
-
-        <div v-if="sizeQueryIndiviual === null && dataRelated"
-          key="sizeQueryIndiviual"
-          style="display: inline-block;width: 100%">
-
-          <p class="caption">So, the data is not related to any parent collections. Any data structure
-            could still be a good option.</p>
-          <h3>Could this data grow large over time?</h3>
-
-          <WizardTip title='If the number of expected entries is fixed or not expected to grow rapidly over time, the answer is probably "No"'
-          />
-
-          <h3>Do you want to be able to query this data seperate from the related collection?
-          </h3>
-          <WizardTip title="If a user has many phone numbers, do you want to be able to query the user's phone numbers without having to also get the user document?"
-          />
-
-          <p class="caption">Choose "Yes" if either are true and "No" if neither are true.</p>
-          <YesNoButtons @yes="sizeQueryIndiviual = true"
-            @no="sizeQueryIndiviual = false" />
-
-        </div>
-        <div v-if="queryAcross === null && sizeQueryIndiviual"
-          key="queryAcross"
-          style="display: inline-block;width: 100%">
-
-          <p class="caption">Cool, we've ruled out nested data. Now, it's down to either a Root-Level
-            Collection or Subcollection.</p>
-          <h3>Do you need to query or mutate multiple records of this data at once?</h3>
-          <WizardTip title="If a user has many phone numbers, do you want to be able to query the phone numbers of several users at once?"
-          />
-          <YesNoButtons @yes="queryAcross = true"
-            @no="queryAcross = false" />
-
-        </div>
-
-        <div v-if="listOfValues === null && sizeQueryIndiviual === false"
-          key="list"
-          style="display: inline-block;width: 100%">
-          <h3>Is this data represented by a list of single values?</h3>
-          <WizardTip title='A user has many roles. A company has many employeeIds. Can usually be represented as a boolean value.'
-          />
-          <YesNoButtons @yes="listOfValues = true"
-            @no="listOfValues = false" />
-
-        </div>
-
-        <div v-if="queryDataByValues === null && listOfValues"
-          key="qbv"
-          style="display: inline-block;width: 100%">
-          <p class="caption">It looks like we've narrowed it down to either a Map or a Array of Values.</p>
-          <h3>Do you want to be able to query a collection by multiple items in the list
-            of values at once?</h3>
-          <WizardTip title='If a user has many roles, do you 
-          want to be able to query users based on several roles in one query?' />
-          <YesNoButtons @yes="queryDataByValues = true"
-            @no="queryDataByValues = false" />
-        </div>
-
-        <div v-if="queryDataByNestedValues === null && listOfValues === false"
-          key="qdbnv"
-          style="display: inline-block;width: 100%">
           <h3>
-            Do you want to be able to query a collection by this data?
-          </h3>
-          <YesNoButtons @yes="queryDataByNestedValues = true"
-            @no="queryDataByNestedValues = false" />
+            <i class="fa fa-magic caption" />&nbsp;Let's try to narrow down which of the following data structures
+            is best suited for the data you have in mind.</h3>
+        </div>
+      </div>
+
+      <div v-else
+        style="display: inline-block;width: 100%"
+        key="finalResult">
+        <p class="caption">The final result is:</p>
+      </div>
+
+      <div key="options"
+        style="display: inline-block;width: 100%">
+        <span v-for="option in availableOptions"
+          :key="option">
+          <el-tag style="margin: 5px;">{{option}}
+
+          </el-tag>
+        </span>
+      </div>
+
+      <div v-if="!inProgress"
+        key="beginButton"
+        style="margin: 10px;display: inline-block;width: 100%">
+
+        <el-button @click="inProgress = true"
+          type="success"
+          round
+          size="lg">Let's Go!</el-button>
+
+      </div>
+    </zoom-center-transition>
+
+    <fade-transition group
+      mode="out-in">
+
+      <div v-if="dataRelated === null && inProgress"
+        key="dataRelated"
+        style="display: inline-block;width: 100%">
+
+        <div>
+          <h3>Is this data related to a parent collection?</h3>
+          <WizardTip title='If a user has many phone numbers, the answer would be "No" for
+        users and "Yes" for phone numbers.' />
+          <YesNoButtons @yes="dataRelated = true"
+            @no="dataRelated = false" />
         </div>
 
-        <div v-if="finalResult"
-          style="display: inline-block;width: 100%"
-          key="startover">
-          <el-button type="text"
-            @click="startOver">
-            <small>Start Over</small>
-          </el-button>
-        </div>
+      </div>
 
-      </fade-transition>
+      <div v-if="sizeQueryIndiviual === null && dataRelated"
+        key="sizeQueryIndiviual"
+        style="display: inline-block;width: 100%">
 
-    </el-card>
+        <p class="caption">So, the data is not related to any parent collections. Any data structure
+          could still be a good option.</p>
+        <h3>Could this data grow large over time?</h3>
+
+        <WizardTip title='If the number of expected entries is fixed or not expected to grow rapidly over time, the answer is probably "No"'
+        />
+
+        <h3>Do you want to be able to query this data seperate from the related collection?
+        </h3>
+        <WizardTip title="If a user has many phone numbers, do you want to be able to query the user's phone numbers without having to also get the user document?"
+        />
+
+        <p class="caption">Choose "Yes" if either are true and "No" if neither are true.</p>
+        <YesNoButtons @yes="sizeQueryIndiviual = true"
+          @no="sizeQueryIndiviual = false" />
+
+      </div>
+      <div v-if="queryAcross === null && sizeQueryIndiviual"
+        key="queryAcross"
+        style="display: inline-block;width: 100%">
+
+        <p class="caption">Cool, we've ruled out nested data. Now, it's down to either a Root-Level
+          Collection or Subcollection.</p>
+        <h3>Do you need to query or mutate multiple records of this data at once?</h3>
+        <WizardTip title="If a user has many phone numbers, do you want to be able to query the phone numbers of several users at once?"
+        />
+        <YesNoButtons @yes="queryAcross = true"
+          @no="queryAcross = false" />
+
+      </div>
+
+      <div v-if="listOfValues === null && sizeQueryIndiviual === false"
+        key="list"
+        style="display: inline-block;width: 100%">
+        <h3>Is this data represented by a list of single values?</h3>
+        <WizardTip title='A user has many roles. A company has many employeeIds. Can usually be represented as a boolean value.'
+        />
+        <YesNoButtons @yes="listOfValues = true"
+          @no="listOfValues = false" />
+
+      </div>
+
+      <div v-if="queryDataByValues === null && listOfValues"
+        key="qbv"
+        style="display: inline-block;width: 100%">
+        <p class="caption">It looks like we've narrowed it down to either a Map or a Array of Values.</p>
+        <h3>Do you want to be able to query a collection by multiple items in the list
+          of values at once?</h3>
+        <WizardTip title='If a user has many roles, do you 
+          want to be able to query users based on several roles in one query?' />
+        <YesNoButtons @yes="queryDataByValues = true"
+          @no="queryDataByValues = false" />
+      </div>
+
+      <div v-if="queryDataByNestedValues === null && listOfValues === false"
+        key="qdbnv"
+        style="display: inline-block;width: 100%">
+        <h3>
+          Do you want to be able to query a collection by this data?
+        </h3>
+        <YesNoButtons @yes="queryDataByNestedValues = true"
+          @no="queryDataByNestedValues = false" />
+      </div>
+
+      <div v-if="finalResult"
+        style="display: inline-block;width: 100%"
+        key="startover">
+        <el-button type="text"
+          @click="startOver">
+          <small>Start Over</small>
+        </el-button>
+      </div>
+
+    </fade-transition>
+
   </div>
 </template>
 

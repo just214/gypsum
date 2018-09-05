@@ -61,10 +61,18 @@ export default {
       const databasesRef = db
         .collection('databases')
         .where('ownerId', '==', context.rootState.auth.userData.id);
-      subscribe(databasesRef, databasesCallback);
-      subscribe(collectionsRef, collectionsCallback);
-      subscribe(fieldsRef, fieldsCallback);
+      this.databaseSubscription = subscribe(databasesRef, databasesCallback);
+      this.collectionsSubscription = subscribe(
+        collectionsRef,
+        collectionsCallback,
+      );
+      this.fieldsSubscription = subscribe(fieldsRef, fieldsCallback);
     });
+  },
+  unsubscribeFromAll() {
+    this.databaseSubscription && this.databaseSubscription();
+    this.collectionsSubscription && this.collectionsSubscription();
+    this.fieldsSubscription && this.fieldsSubscription();
   },
 
   handleTreeChange(context, e) {

@@ -5,7 +5,7 @@
     size="mini"
     style="width: 100%; margin: 4px 0px;"
     placeholder="Copy from..."
-    @change="e => $emit('change', fieldValue)">
+    @change="e => $emit('change', cloneDeep(fieldValue))">
     <el-option v-for='value in allFieldValues'
       :key='value.id + value.collectionFullpath + value.name'
       :label="value.collectionFullpath + '/' + value.name"
@@ -16,6 +16,7 @@
 
 <script>
 import VueTypes from 'vue-types';
+import cloneDeep from 'lodash/cloneDeep';
 
 export default {
   props: {
@@ -24,6 +25,7 @@ export default {
 
   data: () => ({
     fieldValue: '',
+    cloneDeep,
   }),
 };
 </script>

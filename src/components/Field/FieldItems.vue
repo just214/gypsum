@@ -43,7 +43,21 @@
           </el-col>
         </div>
       </el-row>
-      <el-row style="color: var(--gray-6)">
+
+      <el-tag style="margin: 3px;"
+        size="mini"
+        v-if="field.foreignCopyRef">
+        ref: {{ field.foreignCopyRef }}
+      </el-tag>
+
+      <el-tag style="margin: 3px;"
+        size="mini"
+        v-if="field.foreignKeyRef">
+        ref: {{ field.foreignKeyRef }}
+      </el-tag>
+
+      <el-row style="color: var(--gray-6)"
+        v-if="!field.foreignCopy && !field.foreignKey">
 
         <el-tag size="mini"
           type="info"
@@ -85,18 +99,6 @@
           size="mini"
           v-if="field.match">
           match: {{ field.match }}
-        </el-tag>
-
-        <el-tag style="margin: 3px;"
-          size="mini"
-          v-if="field.foreignKeyRef">
-          ref: {{ field.foreignKeyRef }}
-        </el-tag>
-
-        <el-tag style="margin: 3px;"
-          size="mini"
-          v-if="field.foreignCopyRef">
-          ref: {{ field.foreignCopyRef }}
         </el-tag>
 
         <el-tag size="mini"

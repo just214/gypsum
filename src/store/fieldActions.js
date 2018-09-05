@@ -37,7 +37,8 @@ const removeEmptyProperties = (field, collection) => {
     } else if (!field[key]) {
       if (field.id) {
         const collectionField = collection.fields.find(f => f.id === field.id);
-        if (collectionField[key]) {
+
+        if (collectionField && collectionField.length && collectionField[key]) {
           newField[key] = null;
         }
       }
@@ -170,7 +171,7 @@ export default {
       .then(() => {
         const handleForeignKey = () => {
           let foreignKeyRefNames =
-            'These foreignKey references were removed:\n\n';
+            'These foreignKey references were removed:\n';
 
           if (foreignKeyReferences.length) {
             foreignKeyReferences.forEach(ref => {
@@ -183,7 +184,7 @@ export default {
         };
         const handleForeignCopy = () => {
           let foreignCopyRefNames =
-            'These foreignCopy references were removed:\n\n';
+            'These foreignCopy references were removed:\n';
 
           if (foreignCopyReferences.length) {
             foreignCopyReferences.forEach(ref => {
@@ -194,9 +195,18 @@ export default {
           }
           return foreignCopyReferences.length ? foreignCopyRefNames : '';
         };
-        if (handleForeignKey() || handleForeignCopy()) {
-          Notification({
-            message: handleForeignKey() + handleForeignCopy(),
+        if (handleForeignKey()) {
+          Notification.info({
+            title: 'Updated Fields',
+            message: handleForeignKey(),
+            duration: 0,
+          });
+        }
+        if (handleForeignCopy()) {
+          Notification.info({
+            title: 'Updated Fields',
+            message: handleForeignCopy(),
+            duration: 0,
           });
         }
       })

@@ -11,6 +11,7 @@
       <div class="title-wrapper">
         <p style="padding: 0px; margin: 0px;">Welcome to</p>
         <h1>Gypsum</h1>
+        <h3 style="color:var(--warning)">A Firestore Data Management Tool</h3>
       </div>
 
       <el-tabs v-model="activeTab"

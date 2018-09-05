@@ -4,7 +4,31 @@
       <GoBackButton />
     </div>
 
+    <div style="color: var(--gray-8); padding: 0px 40px;">
+      <h3>A work in progress...</h3>
+      <h3>The goal of this feature is to dynamically generate highly secure and optimized
+        Firestore rules based on the data model information you provide, including:</h3>
+
+      <RuleItem title="Collection CRUD permissions"
+        info="Who can create, read, update and delete collections and subcollections."
+      />
+      <RuleItem title="Field Type Validation"
+        info="Make sure a string is a string, a number is a number, etc.." />
+      <RuleItem title="Field Rule Validation"
+        info="required, min length, max length, enums, etc.." />
+
+      <RuleItem title="Authentication"
+        info="Make sure that a user is logged in or that their authentication UID matches another collection's field. "
+      />
+      <RuleItem title="Relational Data Validation" />
+      <RuleItem title="Role-based Permissions" />
+
+      <h3>Below is a very incomplete example that dynamically creates match statements
+        and utility functions based on the model of your currently selected database.</h3>
+    </div>
+
     <div style="text-align: center">
+
       <h3 style="margin: 10px">
         &nbsp;Copy these rules into your
         <span style="color: var(--warning)">firestore.rules</span> file.
@@ -31,9 +55,10 @@
 import { mapGetters } from 'vuex';
 import { getRules } from '@/utils';
 import GoBackButton from '@/components/UI/GoBackButton';
+import RuleItem from './RuleItem';
 
 export default {
-  components: { GoBackButton },
+  components: { GoBackButton, RuleItem },
   computed: {
     ...mapGetters(['allCollections', 'allFieldValues']),
     rules() {

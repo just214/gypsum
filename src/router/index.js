@@ -9,6 +9,8 @@ import MainPage from '@/components/MainPage';
 import WizardPage from '@/components/Wizard/WizardPage';
 import RulesPage from '@/components/Rules/RulesPage';
 import ClusterPage from '@/components/Cluster/ClusterPage';
+import TerminologyPage from '@/components/Terminology/TerminologyPage';
+import CheatsheetsPage from '@/components/CheatSheets/CheatsheetsPage';
 
 Vue.use(Router);
 
@@ -38,9 +40,23 @@ const router = new Router({
       meta: { requiresRegistration: true },
     },
     {
+      path: '/terminology',
+      name: 'TerminologyPage',
+      component: TerminologyPage,
+      meta: { requiresRegistration: true },
+    },
+
+    {
       path: '/rules',
       name: 'RulesPage',
       component: RulesPage,
+      meta: { requiresRegistration: true },
+    },
+
+    {
+      path: '/cheatsheets',
+      name: 'CheatsheetsPage',
+      component: CheatsheetsPage,
       meta: { requiresRegistration: true },
     },
     {
@@ -58,6 +74,7 @@ auth().onAuthStateChanged(authUser => {
     store.commit('auth/AUTH_SUCCESS');
     router.replace('/');
   } else {
+    store.dispatch('unsubscribeFromAll');
     router.replace('/login');
   }
 });

@@ -20,9 +20,17 @@
       size="mini"
       style="width: 100%; margin: 4px 0px;"
       placeholder="Data Type">
-      <el-option v-for="dataType in dataTypes"
-        :key="dataType"
-        :value="dataType">
+      <el-option v-for="dataType in dataTypes2"
+        :key="dataType.name"
+        :value="dataType.name"
+        style="width: 250px;height: auto;">
+        <b>{{dataType.name}}</b>&nbsp;&nbsp;
+        <div>
+          <el-tag v-for="example in dataType.examples"
+            :key="example"
+            size="mini">{{example}}</el-tag>
+        </div>
+
       </el-option>
     </el-select>
 
@@ -300,19 +308,31 @@ export default {
     enumInputVisible: false,
     inputValue: '',
     fieldValues: INITIAL_FIELD_VALUES,
-    dataTypes: [
-      'string',
-      'number',
-      'float',
-      'integer',
-      'boolean',
-      'map',
-      'object',
-      'array',
-      'null',
-      'timestamp',
-      'geopoint',
-      'reference',
+    dataTypes2: [
+      { name: 'string', examples: ['"This is a string."'] },
+      { name: 'number', examples: [11, -48, 0, 3.43] },
+      { name: 'float', examples: [2.3, -3.0] },
+      { name: 'integer', examples: [11, -7, 0] },
+      { name: 'boolean', examples: [true, false] },
+      { name: 'map', examples: ['{ admin: false, editor: true }'] },
+      { name: 'object', examples: ['{ firstName: "Bob", age: 48 }'] },
+      {
+        name: 'array',
+        examples: ['[ "hi", 22, {a: "b"}, true ]'],
+      },
+      {
+        name: 'null',
+        examples: ['null'],
+      },
+      {
+        name: 'timestamp',
+        examples: ['Thu Aug 23 2018 00:59:59 GMT-0400...'],
+      },
+      {
+        name: 'geopoint',
+        examples: [],
+      },
+      { name: 'reference', examples: ['/databases/$(database)/documents/...'] },
     ],
   }),
   computed: {
@@ -369,6 +389,14 @@ export default {
     }, 10);
   },
   watch: {
+    'fieldValues.emums'() {
+      // TODO- Make sure each enum matches the dataType selected, if any.
+      // if (!values.length) return;
+      // if (!this.fieldValues.dataType) return;
+      // values.forEach(value => {
+      //   if ()
+      // })
+    },
     'fieldValues.primaryKey'(value) {
       if (value) {
         this.ui.isForeignKey = false;
@@ -440,11 +468,8 @@ export default {
         const thisRef = this.allFieldValues.filter(
           field => field.id === value,
         )[0];
-        const { key, ...rest } = thisRef;
 
         this.fieldValues = {
-          ...this.fieldValues,
-          ...rest,
           name: `${pluralize.singular(thisRef.collectionFullpath)}${upperFirst(
             thisRef.name,
           )}`,

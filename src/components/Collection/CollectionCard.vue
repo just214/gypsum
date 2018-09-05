@@ -138,13 +138,16 @@ export default {
       this.addSubcollectionMode = false;
     },
     handleHover(field) {
-      document.getElementById(field.id).style =
-        'background-color: var(--gray-1)';
-      if (field.foreignKey) {
+      // if (document.getElementById(field.id)) {
+      //   document.getElementById(field.id).style =
+      //     'background-color: var(--gray-1)';
+      // }
+
+      if (field.foreignKey && document.getElementById(field.foreignKey)) {
         document.getElementById(field.foreignKey).style =
           'background-color: #FFFFE0';
       }
-      if (field.foreignCopy) {
+      if (field.foreignCopy && document.getElementById(field.foreignCopy)) {
         document.getElementById(field.foreignCopy).style =
           'background-color: #FFFFE1';
       }
@@ -156,7 +159,7 @@ export default {
           'border: 1px dashed lightgray';
       }
 
-      if (field.foreignCopy) {
+      if (field.foreignCopy && document.getElementById(field.foreignCopy)) {
         document.getElementById(field.foreignCopy).style =
           'border: 1px dashed lightgray';
         document.getElementById(field.foreignCopy).style =

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 **TYPES OF CHANGES: Added, Changed, Deprecated, Removed, Fixed, Security**
 
+## [unreleased]- 09-04-2018
+
+### Added
+
+- /terminology
+- /cheatsheets
+- Set up Firebase Firestore and Hosting init.
+- Added meta info to index.html and added images and favicon.
+
+### Changed
+
+- Fixed issue with copying a field.
+
 ## [Unreleased]- 08-22-2018
 
 ### Changed
