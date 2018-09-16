@@ -24,7 +24,6 @@
           <el-input size="mini"
             v-model="collectionName"
             ref="collectionNameInput"
-            v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
             style="width: 200px"
             @keyup.enter.native="handleEdit" />
           <el-button round

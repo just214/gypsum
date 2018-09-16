@@ -10,7 +10,6 @@
       size="small"
       ref="nameInput"
       @keyup.enter.native="handleSave"
-      v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
       v-model="fieldValues.name" />
 
     <el-select v-model="fieldValues.dataType"
@@ -112,14 +111,22 @@
           @close="handleClose(tag, fieldValues.enums)">
           {{tag}}
         </el-tag>
-        <el-input class="input-new-tag"
-          v-if="enumInputVisible"
-          v-model="inputValue"
-          ref="saveTagInput"
-          size="mini"
-          @keyup.enter.native="handleInputConfirm(fieldValues.enums)"
-          @blur="handleInputConfirm(fieldValues.enums)">
-        </el-input>
+        <div v-if="enumInputVisible"
+          style="display: flex; align-items: center;justify-content: center">
+          <el-input class="input-new-tag"
+            v-model="inputValue"
+            ref="saveTagInput"
+            size="mini"
+            @keyup.enter.native="handleInputConfirm(fieldValues.enums)">
+          </el-input>&nbsp;
+          <i @click="handleInputConfirm(fieldValues.enums)"
+            class="fa fa-check"
+            style="color: var(--success);cursor: pointer;margin: 0px 5px;" />
+          <i @click="enumInputVisible = false; inputValue = '' "
+            class="fa fa-times"
+            style="color: var(--danger);cursor: pointer;margin: 0px 5px;" />
+        </div>
+
         <el-button v-else
           class="button-new-tag"
           size="small"
@@ -197,6 +204,7 @@
           placeholder="Array Item Data Type">
           <el-option v-for="dataType in arrayDataTypes"
             :key="dataType"
+            :label="dataType"
             :value="dataType">
           </el-option>
         </el-select>
@@ -297,6 +305,7 @@ export default {
     if (this.model) {
       // * Need to break the reference so that the field values do not change
       // * until saved.
+
       this.fieldValues = { ...this.fieldValues, ...cloneDeep(this.model) };
     }
   },
@@ -337,7 +346,17 @@ export default {
   }),
   computed: {
     arrayDataTypes() {
-      return [...this.dataTypes, 'mixed'].filter(type => type !== 'array');
+      return [
+        'string',
+        'number',
+        'float',
+        'integer',
+        'boolean',
+        'map',
+        'object',
+        'mixed',
+        '',
+      ];
     },
     isEditFieldMode() {
       return !isEmpty(this.model);
@@ -365,6 +384,12 @@ export default {
     handleInputConfirm() {
       const { inputValue } = this;
       if (inputValue) {
+        if (this.fieldValues.enums.includes(inputValue)) {
+          this.$message.error(
+            `There is already an enum with the name "${inputValue}".`,
+          );
+          return;
+        }
         this.fieldValues.enums.push(inputValue);
       }
       this.enumInputVisible = false;

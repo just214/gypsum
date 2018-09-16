@@ -14,14 +14,14 @@
 import GoBackButton from '@/components/UI/GoBackButton';
 import Term from './Term';
 
-const options = [
-  'Root-Level Collection',
-  'Subcollection',
-  'Nested Array of Objects',
-  'Nested Array of Values',
-  'Nested Object',
-  'Map',
-];
+// const options = [
+//   'Root-Level Collection',
+//   'Subcollection',
+//   'Nested Array of Objects',
+//   'Nested Array of Values',
+//   'Nested Object',
+//   'Map',
+// ];
 
 export default {
   components: {
@@ -57,7 +57,7 @@ export default {
   }),
   computed: {
     sortedTerms() {
-      return this.terms.sort((a, b) => {
+      return [...this.terms].sort((a, b) => {
         const aTerm = a.term.toLowerCase();
         const bTerm = b.term.toLowerCase();
 

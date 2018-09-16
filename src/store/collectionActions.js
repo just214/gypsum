@@ -70,9 +70,17 @@ export default {
     });
   },
   unsubscribeFromAll() {
-    this.databaseSubscription && this.databaseSubscription();
-    this.collectionsSubscription && this.collectionsSubscription();
-    this.fieldsSubscription && this.fieldsSubscription();
+    if (this.databaseSubscription) {
+      this.databaseSubscription();
+    }
+
+    if (this.collectionsSubscription) {
+      this.collectionsSubscription();
+    }
+
+    if (this.fieldsSubscription) {
+      this.fieldsSubscription();
+    }
   },
 
   handleTreeChange(context, e) {

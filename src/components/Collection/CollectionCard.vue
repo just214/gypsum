@@ -2,12 +2,12 @@
   <div>
     <div style="text-align: center;">
       <el-button @click="addFieldMode = !addFieldMode"
-        style="margin: 0px 8px;width: 70px;"
+        style="margin: 0px 8px;width: 60px;"
         round
         size="mini">Field+</el-button>
       <el-button @click="addSubcollectionMode = !addSubcollectionMode"
         v-if="type !== 'subcollection'"
-        style="margin: 8px;width: 130px;"
+        style="margin: 8px;width: 110px;"
         round
         size="mini">Subcollection+</el-button>
 

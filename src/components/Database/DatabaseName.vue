@@ -6,15 +6,15 @@
         duration="120">
 
         <span v-if="!editMode"
-          style="display: flex; align-items: center;width: 300px;">
+          style="display: flex; justify-content: center; align-items: center;width: 100%;">
 
           <el-select v-model="selectedDatabaseId"
             placeholder="Select a database"
             size="mini"
-            style="width: 60%">
+            style="width: 180px">
 
             <el-option v-for="db in $store.state.databases"
-              style="width: 200px"
+              style="width: 180px"
               :key="db.id"
               :label="db.name"
               :value="db.id">
@@ -24,7 +24,6 @@
             <div style="margin:0px">
               <el-input v-model.trim="databaseName"
                 clearable
-                v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
                 size="mini"
                 :minlength="1"
                 :maxlength="40"
@@ -47,6 +46,7 @@
               <p>Are you sure you want to delete this database and all of it's collections?</p>
             </DeletePopover>
           </span>
+
         </span>
 
         <div v-if="editMode && selectedDatabaseId "

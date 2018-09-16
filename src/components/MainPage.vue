@@ -105,7 +105,8 @@
           style="position:absolute;bottom: 0px;left: 50%;
     transform: translate(-50%, 0);text-align: center;display: inline-block;">
 
-          <img src="../assets/potoo.png" />
+          <img :style="{height: $mq === 'xs' ? '150px' : '100%'}"
+            src="../assets/potoo.png" />
         </div>
 
       </transition>
@@ -318,9 +319,9 @@ export default {
   position: fixed;
   transform: translateX(-50%);
   left: 50%;
-  flex-wrap: wrap;
+  word-wrap: normal;
   color: var(--gray-5);
-  width: 350px;
+  width: 320px;
 }
 
 .title-text {
@@ -362,6 +363,7 @@ export default {
 .collection-card {
   border-radius: 20px;
   width: 350px;
+  max-width: 98vw;
   height: 80vh;
   max-height: 90vh;
   overflow: scroll;

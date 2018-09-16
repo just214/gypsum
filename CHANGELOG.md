@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 **TYPES OF CHANGES: Added, Changed, Deprecated, Removed, Fixed, Security**
 
+## [unreleased]- 09-16-2018
+
+### Changed
+
+- Fixed an issue where the array item type select was not populating the selection.
+- Fixed an issue where the enums were getting overwrited when adding a new one.
+
+### Added
+
+- Added save/cancel buttons to enum input.
+
 ## [unreleased]- 09-04-2018
 
 ### Added

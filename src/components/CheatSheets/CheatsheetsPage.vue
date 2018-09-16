@@ -4,12 +4,12 @@
       <GoBackButton />
     </div>
 
-    <el-card>
+    <!-- <el-card>
       <h4>Data Types</h4>
       <el-tag style="margin: 3px;"
         v-for="type in dataTypes"
         :key="type">{{type}}</el-tag>
-    </el-card>
+    </el-card> -->
 
     <img style="max-width: 100%;"
       src="../../assets/cheatsheet.png"

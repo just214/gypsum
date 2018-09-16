@@ -3,7 +3,6 @@
     <el-input clearable
       size="mini"
       v-model="databaseName"
-      v-mask="'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'"
       :minlength="1"
       style="width: 60%;margin: 5px;"
       @keyup.enter.native="handleAdd"
